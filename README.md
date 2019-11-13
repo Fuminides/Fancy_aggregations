@@ -17,7 +17,7 @@ Most of them only support symetric measures.
 ## Implemented measures
 - Cardinality
 
-##Reference papers
+## Reference papers
 Each file contains the correspondent paper in its header. Here it is the whole list:
 
 <a id="1"> [1]  A.H. Altalhi, J.I. Forcén, M. Pagola, E. Barrenechea, H. Bustince, Zdenko Takáč,
