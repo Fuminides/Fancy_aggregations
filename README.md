@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/221485987.svg)](https://zenodo.org/badge/latestdoi/221485987)
+
 # Fancy Aggregations
 
 Fanzy Aggregations is a package written in python that implements modern functions to aggregate data using Choquet integral, CF12 generalization, Sugeno, etc. More are to come. Our target is to give a wide range of functions to work with and to generate/use different fuzzy measures.
