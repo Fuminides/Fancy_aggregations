@@ -85,7 +85,6 @@ def cut_point(D, x_sigma, Mp, Mn):
 
 def moderate_deviation_f(X, D=distance_f2, Mp=1, Mn=1):
     '''
-    Expression () in the following paper.
 
     
     '''
@@ -115,3 +114,32 @@ def moderate_deviation_eq(X, D=distance_f1, Mp=1, Mn=1):
     y2 = (-b - sqr_term) / (2*a)
 
     return y1, y2
+
+def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_eq):
+    '''
+    Designed to use the md functions using the same interface as the rest of the numpy aggregation functions.
+
+    :param X:
+    :param axis:
+    :param keepdims:
+    :param md_function:
+    :return:
+    '''
+    if axis != 0:
+        X = np.swapaxes(X, (0, axis))
+
+    clasificadores, muestras, clases = X.shape
+    if keepdims:
+        result = np.zeros((1, muestras, clases))
+    else:
+        result = np.zeros((muestras, clases))
+
+    for m in range(muestras):
+        if keepdims:
+            result[0, m, 0] = md_function(X[:, m, 0], Mp=1, Mn=10)
+            result[0, m, 1] = md_function(X[:, m, 1], Mp=1, Mn=10)
+        else:
+            result[m, 0] = md_function(X[:, m, 0], Mp=1, Mn=10)
+            result[m, 1] = md_function(X[:, m, 1], Mp=1, Mn=10)
+
+    return result
