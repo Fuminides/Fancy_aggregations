@@ -115,7 +115,7 @@ def moderate_deviation_eq(X, D=distance_f1, Mp=1, Mn=1):
 
     return y1, y2
 
-def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_eq):
+def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_f):
     '''
     Designed to use the md functions using the same interface as the rest of the numpy aggregation functions.
 
@@ -126,7 +126,7 @@ def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_eq):
     :return:
     '''
     if axis != 0:
-        X = np.swapaxes(X, (0, axis))
+        X = np.transpose(X, (0, axis))
 
     clasificadores, muestras, clases = X.shape
     if keepdims:
@@ -135,6 +135,7 @@ def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_eq):
         result = np.zeros((muestras, clases))
 
     for m in range(muestras):
+        #print(md_function(X[:, m, 0], Mp=1, Mn=10))
         if keepdims:
             result[0, m, 0] = md_function(X[:, m, 0], Mp=1, Mn=10)
             result[0, m, 1] = md_function(X[:, m, 1], Mp=1, Mn=10)

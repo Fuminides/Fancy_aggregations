@@ -100,7 +100,7 @@ def lucrezia_simple_decisor(X, keepdims=False, axis=0, tnorm=min, agg_function=n
     :return:
     '''
     if axis != 0:
-        X = np.swapaxes(X, (0, axis))
+        X = np.swapaxes(X, 0, axis)
 
     clasificadores, muestras, clases = X.shape
     simple_votes = np.argmax(X, axis=2) #Returns a matrix: classifier x samples (x predicted class, singleton dimension omitted)

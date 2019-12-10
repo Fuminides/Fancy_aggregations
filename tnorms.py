@@ -21,7 +21,11 @@ def hamacher_tnorm(x, y=None):
         return v_tnorm(x, hamacher_tnorm)
 
     zero_pairs = np.logical_and(np.equal(x, 0), np.equal(y, 0))
-    non_zero_terms = [aux for aux in range(len(x)) if not zero_pairs[aux]]
+    try:
+        non_zero_terms = [aux for aux in range(len(x)) if not zero_pairs[aux]]
+    except ValueError:
+        non_zero_terms = 1 - zero_pairs
+        non_zero_terms = non_zero_terms.astype(bool)
 
     try:
         result = np.zeros(x.shape)
@@ -35,27 +39,39 @@ def hamacher_tnorm(x, y=None):
     return result
 
 
-def lukasiewicz_tnorm(x, y):
+def lukasiewicz_tnorm(x, y=None):
     '''
     :return: Lukasiewicz t-norm for a pair-wise or alongside a vector if only one is specified. 
     '''
+    if y is None:
+        return v_tnorm(x, lukasiewicz_tnorm)
     return np.maximum(0, x + y - 1)
 
+def luka_tnorm(x, y=None):
+    '''
+    :return: Lukasiewicz t-norm for a pair-wise or alongside a vector if only one is specified.
+    '''
+    return lukasiewicz_tnorm(x, y)
 
-def drastic_tnorm(x, y):
+
+def drastic_tnorm(x, y=None):
     '''
     :return: Drastic t-norm for a pair-wise or alongside a vector if only one is specified. 
     '''
+    if y is None:
+        return v_tnorm(x, drastic_tnorm)
     buenos_x = np.multiply(x, np.equal(x, 0))
     buenos_y = np.multiply(y, np.equal(y, 0))
     malos = np.zeros(x.shape)
     return buenos_x + buenos_y + malos
 
 
-def nilpotent_tnorm(x, y):
+def nilpotent_tnorm(x, y=None):
     '''
     :return: Idelpotent t-norm for a pair-wise or alongside a vector if only one is specified. 
     '''
+    if y is None:
+        return v_tnorm(x, nilpotent_tnorm)
     terminos1 = (x + y) > 1
     return np.minimum(x, y) * terminos1
 
