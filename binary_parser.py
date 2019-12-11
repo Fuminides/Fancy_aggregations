@@ -43,6 +43,6 @@ def parse(agg_name, axis = 0, keepdims=True):
     elif agg_minuscula == 'owa3':
         return lambda a: owas.OWA3(a, axis=axis, keepdims=keepdims)
     elif agg_minuscula == 'lucrezia':
-        return lambda a: networks.lucrezia_simple_decisor(a, axis=axis, keepdims=keepdims, tnorm=np.min, agg_function=np.mean)
+        return lambda a: networks.lucrezia_simple_decisor(a, axis=axis, keepdims=keepdims, tnorm=np.minimum, agg_function=np.mean)
     else:
         raise KeyError
