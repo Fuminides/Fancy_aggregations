@@ -12,7 +12,7 @@ import tnorms
 import networks
 import owas
 
-supported_functions = ['mean', 'median', 'min', 'max', 'md', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'owa1', 'owa2', 'owa3', 'lucrezia']
+supported_functions = ['mean', 'median', 'min', 'max', 'md', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'lucrezia']
 
 def parse(agg_name, axis = 0, keepdims=True):
     agg_minuscula = agg_name.lower()
@@ -42,6 +42,8 @@ def parse(agg_name, axis = 0, keepdims=True):
         return lambda a: owas.OWA2(a, axis=axis, keepdims=keepdims)
     elif agg_minuscula == 'owa3':
         return lambda a: owas.OWA3(a, axis=axis, keepdims=keepdims)
+    elif agg_minuscula == 'cf':
+        return lambda a: integrals.choquet_integral_CF(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims)
     elif agg_minuscula == 'lucrezia':
         return lambda a: networks.lucrezia_simple_decisor(a, axis=axis, keepdims=keepdims, tnorm=np.minimum, agg_function=np.mean)
     else:

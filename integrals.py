@@ -24,6 +24,7 @@ To suggest changes or submit new code please use the github page.
 """
 
 import numpy as np
+import tnorms
 # =============================================================================
 # ~ MEASURES
 # =============================================================================
@@ -72,6 +73,27 @@ def choquet_integral_symmetric(X, measure=None, axis=0, keepdims=True):
 
     X_differenced = np.apply_along_axis(_differentiation_1_distance, axis, X_sorted)
     X_agg  = np.apply_along_axis(lambda a: np.dot(a, measure), axis, X_differenced)
+
+    if keepdims:
+        X_agg = np.expand_dims(X_agg, axis=axis)
+
+    return X_agg
+
+def choquet_integral_CF(X, measure=None, axis=0, tnorm=tnorms.hamacher_tnorm, keepdims=True):
+    '''
+    Aggregates a numpy array alongise an axis using the choquet integral.
+
+    :param X: Data to aggregate.
+    :param measure: Vector containing the measure numeric values (Symmetric!)
+    :param axis: Axis alongside to aggregate.
+    '''
+    if measure is None:
+        measure = generate_cardinality(X.shape[axis])
+
+    X_sorted = np.sort(X, axis = axis)
+
+    X_differenced = np.apply_along_axis(_differentiation_1_distance, axis, X_sorted)
+    X_agg  = np.sum(np.apply_along_axis(lambda a: tnorm(a, measure), axis, X_differenced), axis=axis)
 
     if keepdims:
         X_agg = np.expand_dims(X_agg, axis=axis)
