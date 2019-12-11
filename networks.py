@@ -45,7 +45,7 @@ def lippman_decisor(X, keepdims=False, axis=0, tnorm=min, agg_function=np.max, a
     :return:
     '''
     if axis != 0:
-        X = np.swapaxes(X, (0, axis))
+        X = np.swapaxes(X, 0, axis)
 
     clasificadores, muestras, clases = X.shape
     simple_votes = np.argmax(X, axis=2) #Returns a matrix: classifier x samples (x predicted class, singleton dimension omitted)
@@ -89,7 +89,7 @@ def lippman_decisor(X, keepdims=False, axis=0, tnorm=min, agg_function=np.max, a
             final_votes[muestra,1] = scores[1]
 
     if axis != 0:
-        X = np.swapaxes(X, (axis, 0))
+        X = np.swapaxes(X, axis, 0)
     return final_votes
 
 def lucrezia_simple_decisor(X, keepdims=False, axis=0, tnorm=min, agg_function=np.max, aff_func=_jaccard_affinity, labels=None):
@@ -151,6 +151,6 @@ def lucrezia_simple_decisor(X, keepdims=False, axis=0, tnorm=min, agg_function=n
             final_votes[muestra, 1] = scores[1]
 
     if axis != 0:
-        X = np.swapaxes(X, (axis, 0))
+        X = np.swapaxes(X, axis, 0)
 
     return final_votes
