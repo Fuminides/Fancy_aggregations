@@ -30,6 +30,9 @@ def OWA_generic(X, a, b, axis=0, keepdims=True):
     w = generate_owa_weights(X.shape[axis], lambda x: std_quantifier(x, a=0.1, b=0.5))
     X_agg  = np.apply_along_axis(lambda a: np.dot(a, w), axis, X_sorted)
 
+    if keepdims:
+        X_agg = np.expand_dims(X_agg, axis=axis)
+
     return X_agg
 
 def OWA1(X, axis=0, keepdims=True):
