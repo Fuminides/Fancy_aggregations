@@ -5,14 +5,13 @@ Fanzy Aggregations is a package written in python that implements modern functio
 ## Implemented functions
 
 - Choquet Integral
-- Choquet Integral CF<sub>1,2</sub>
-- Sugeno integral
-- Generalized Tsukeno integral
+- Choquet Integral CF and CF<sub>1,2</sub>
+- Sugeno integral and generalizations.
 - Wide range of T-norms (and T-conorms).
-- OWA basic expression.
+- Implication operators.
+- OWA operators.
+- Penalty functions.
 - MD deviations.
-
-Most of them only support symetric measures.
 
 ## Implemented measures
 - Cardinality
