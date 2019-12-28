@@ -13,6 +13,9 @@ import numpy as np
 # =============================================================================
 # ~ T - NORMS
 # =============================================================================
+def prod(x, y):
+    return x * y
+    
 def hamacher_tnorm(x, y=None):
     '''
     :return: Hamacher t-norm for a pair-wise or alongside a vector if only one is specified. 

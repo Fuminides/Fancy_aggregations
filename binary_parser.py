@@ -29,7 +29,9 @@ def parse(agg_name, axis_f = 0, keepdims_f=True):
     elif agg_minuscula == 'sugeno':
         return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.sugeno_fuzzy_integral(a, integrals.generate_cardinality_matrix(a.shape[axis], a.shape), axis=axis, keepdims=keepdims)
     elif agg_minuscula == 'shamacher':
-        return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.sugeno_fuzzy_integral_generalized(a, integrals.generate_cardinality_matrix(a.shape[axis], a.shape), axis=axis, keepdims=keepdims)
+        return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.sugeno_fuzzy_integral_generalized(a, integrals.generate_cardinality_matrix(a.shape[axis], a.shape), axis=axis, keepdims=keepdims, f1 = tnorms.hamacher_tnorm, f2 = np.amax)
+    elif agg_minuscula == 'fhamacher':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.sugeno_fuzzy_integral_generalized(a, integrals.generate_cardinality_matrix(a.shape[axis], a.shape), axis=axis, keepdims=keepdims, f1 = tnorms.prod, f2 = np.sum)
     elif agg_minuscula == 'choquet':
         return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.choquet_integral_symmetric(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims)
     elif agg_minuscula == 'cfminmin':
