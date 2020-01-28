@@ -27,7 +27,7 @@ def owa(X, weights):
 
 def OWA_generic(X, a, b, axis=0, keepdims=True):
     X_sorted = -np.sort(-X, axis = axis)
-    w = generate_owa_weights(X.shape[axis], lambda x: std_quantifier(x, a=0.1, b=0.5))
+    w = generate_owa_weights(X.shape[axis], lambda x: std_quantifier(x, a=a, b=b))
     X_agg  = np.apply_along_axis(lambda a: np.dot(a, w), axis, X_sorted)
 
     if keepdims:
