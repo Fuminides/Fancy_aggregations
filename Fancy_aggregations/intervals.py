@@ -13,7 +13,7 @@ URL: http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=5782984&isnumber=60
 To suggest changes or submit new code please use the github page.
 """
 
-import implications as _imp
+import Fancy_aggregations.implications as _imp
 
 def intervaluate(x, y, implication_operator=_imp.reinchenbag_implication):
     """Returns a tuple with the interval composed using x, y and an implication operador."""

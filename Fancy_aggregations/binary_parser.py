@@ -6,12 +6,13 @@ Created on 04/12/2019
 @author: Javier Fumanal Idocin
 """
 import numpy as np
-import integrals
-import moderate_deviations
-import tnorms
-import networks
-import owas
-import overlaps
+
+import Fancy_aggregations.integrals as integrals
+import Fancy_aggregations.moderate_deviations as moderate_deviations
+import Fancy_aggregations.tnorms as tnorms
+import Fancy_aggregations.networks as networks
+import Fancy_aggregations.owas as owas
+import Fancy_aggregations.overlaps as overlaps
 
 supported_functions = ['mean', 'median', 'min', 'max', 'md', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'lucrezia']
 
