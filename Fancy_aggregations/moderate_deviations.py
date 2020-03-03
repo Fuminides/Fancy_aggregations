@@ -86,7 +86,7 @@ def cut_point(D, x_sigma, Mp, Mn):
 def moderate_deviation_f(X, D=distance_f2, Mp=1, Mn=1):
     '''
 
-    
+
     '''
     n = len(X)
     x_sigma = np.sort(X)
@@ -144,3 +144,4 @@ def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_f):
             result[m, 1] = md_function(X[:, m, 1], Mp=1, Mn=10)
 
     return result
+
