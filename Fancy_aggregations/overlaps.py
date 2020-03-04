@@ -28,8 +28,8 @@ def harmonic_mean(X, axis=0, keepdims=True, dtype=None):
 
 	size = X.shape[axis]
 	with np.errstate(divide='ignore', invalid='ignore'):
-		pruned = size / np.sum(1.0 / a, axis=axis, dtype=dtype)
-		pruned = np.nan_to_num(base_result)
+		pruned = size / np.sum(1.0 / X, axis=axis, dtype=dtype)
+		pruned = np.nan_to_num(pruned)
 
 	if keepdims:
 		pruned = np.expand_dims(pruned, axis=axis)
