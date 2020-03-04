@@ -14,7 +14,7 @@ import Fancy_aggregations.networks as networks
 import Fancy_aggregations.owas as owas
 import Fancy_aggregations.overlaps as overlaps
 
-supported_functions = ['mean', 'median', 'min', 'max', 'md', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'lucrezia']
+supported_functions = ['mean', 'median', 'min', 'max', 'md', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'sinoverlap', 'hmean', 'lucrezia']
 
 def parse(agg_name, axis_f = 0, keepdims_f=True):
     agg_minuscula = agg_name.lower()
@@ -57,4 +57,4 @@ def parse(agg_name, axis_f = 0, keepdims_f=True):
     elif agg_minuscula == 'lucrezia':
         return lambda a, axis=axis_f, keepdims=keepdims_f: networks.lucrezia_simple_decisor(a, axis=axis, keepdims=keepdims, tnorm=np.minimum, agg_function=np.mean)
     else:
-        raise KeyError
+        raise KeyError(agg_name)
