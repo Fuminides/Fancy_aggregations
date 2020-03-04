@@ -21,14 +21,15 @@ def sin_overlap(X, axis=0, keepdims=True):
 	exponent = 1 / (2 * X.shape[axis])
 	return np.sin(np.pi/2 * np.power(np.prod(X, axis=axis, keepdims=keepdims), exponent))
 
-def harmonic_mean(X, axis=0, keepdims=True):
+def harmonic_mean(X, axis=0, keepdims=True, dtype=None):
 	'''
 	Returns the harmonic mean. Checks for nan and keep dims. Requires scipy.
 	'''
-	import scipy.stats
-
-	base_result = scipy.stats.hmean(X, axis=axis)
-	pruned = np.nan_to_num(base_result)
+	
+	size = X.shape[axis]
+	with np.errstate(divide='ignore', invalid='ignore')
+		pruned = size / np.sum(1.0 / a, axis=axis, dtype=dtype)
+		pruned = np.nan_to_num(base_result)
 
 	if keepdims:
 		pruned = np.expand_dims(pruned, axis=axis)
