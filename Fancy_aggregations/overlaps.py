@@ -25,9 +25,9 @@ def harmonic_mean(X, axis=0, keepdims=True, dtype=None):
 	'''
 	Returns the harmonic mean. Checks for nan and keep dims. Requires scipy.
 	'''
-	
+
 	size = X.shape[axis]
-	with np.errstate(divide='ignore', invalid='ignore')
+	with np.errstate(divide='ignore', invalid='ignore'):
 		pruned = size / np.sum(1.0 / a, axis=axis, dtype=dtype)
 		pruned = np.nan_to_num(base_result)
 
