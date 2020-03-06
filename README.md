@@ -12,9 +12,7 @@ Fanzy Aggregations is a package written in python that implements modern functio
 - OWA operators.
 - Penalty functions.
 - MD deviations.
-
-## Implemented measures
-- Cardinality
+- N-Overlap functions.
 
 ## Reference papers
 Each file contains the correspondent paper in its header. Here it is the whole list:
@@ -46,6 +44,8 @@ Pages 44-67,
 ISSN 0165-0114,
 https://doi.org/10.1016/j.fss.2019.01.009.
 (http://www.sciencedirect.com/science/article/pii/S0165011418305451)
+
+<a id="5"> [5] Beliakov, G., Sola, H. B., & Sánchez, T. C. (2016). A practical guide to averaging functions (Vol. 329). Heidelberg: Springer.
 
 ### Mandatory
 * Numpy
