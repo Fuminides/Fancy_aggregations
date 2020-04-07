@@ -64,10 +64,10 @@ def std_quantifier(x, a=0.0, b=1.0):
     :param b:
     :return:
     '''
-    Q = x - a / (b - a)
-    if Q < a:
+    Q = (x-a) / (b - a)
+    if x < a:
         return 0
-    elif Q > b:
+    elif x > b:
         return 1
     else:
         return Q
