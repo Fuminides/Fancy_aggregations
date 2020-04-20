@@ -118,7 +118,7 @@ def moderate_deviation_eq(X, D=distance_f1, Mp=1, Mn=1):
 def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_f):
     '''
     Designed to use the md functions using the same interface as the rest of the numpy aggregation functions.
-
+    IT ONLY WORKS IN 3 DIMENSIONAL ARRAY (features, samples, classes)
     :param X:
     :param axis:
     :param keepdims:
@@ -130,18 +130,21 @@ def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_f):
 
     clasificadores, muestras, clases = X.shape
     if keepdims:
-        result = np.zeros((1, muestras, clases))
+        result = np.zeros([1] +list(X.shape[1:]))
     else:
-        result = np.zeros((muestras, clases))
+        result = np.zeros(X.shape[1:])
 
     for m in range(muestras):
         #print(md_function(X[:, m, 0], Mp=1, Mn=10))
         if keepdims:
-            result[0, m, 0] = md_function(X[:, m, 0], Mp=1, Mn=10)
-            result[0, m, 1] = md_function(X[:, m, 1], Mp=1, Mn=10)
+            for clase in range(clases):
+                result[0, m, clase] = md_function(X[:, m, clase], Mp=1, Mn=10)
         else:
-            result[m, 0] = md_function(X[:, m, 0], Mp=1, Mn=10)
-            result[m, 1] = md_function(X[:, m, 1], Mp=1, Mn=10)
+            for clase in range(clases):
+                result[m, clase] = md_function(X[:, m, clase], Mp=1, Mn=10)
+
+    if axis != 0:
+        X = np.transpose(X, (0, axis))
 
     return result
 
