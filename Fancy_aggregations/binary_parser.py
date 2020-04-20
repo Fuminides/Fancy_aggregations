@@ -7,12 +7,12 @@ Created on 04/12/2019
 """
 import numpy as np
 
-import Fancy_aggregations.integrals as integrals
-import Fancy_aggregations.moderate_deviations as moderate_deviations
-import Fancy_aggregations.tnorms as tnorms
-import Fancy_aggregations.networks as networks
-import Fancy_aggregations.owas as owas
-import Fancy_aggregations.overlaps as overlaps
+from . import integrals
+from . import moderate_deviations
+from . import tnorms
+from . import networks
+from . import owas
+from . import overlaps
 
 supported_functions = ['mean', 'median', 'min', 'max', 'md', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'sinoverlap', 'hmean', 'lucrezia']
 
@@ -56,5 +56,10 @@ def parse(agg_name, axis_f = 0, keepdims_f=True):
         return lambda a, axis=axis_f, keepdims=keepdims_f: overlaps.harmonic_mean(a, axis=axis, keepdims=keepdims)
     elif agg_minuscula == 'lucrezia':
         return lambda a, axis=axis_f, keepdims=keepdims_f: networks.lucrezia_simple_decisor(a, axis=axis, keepdims=keepdims, tnorm=np.minimum, agg_function=np.mean)
+    elif agg_minuscula == 'mode':
+        from scipy.stats import mode
+        if keepdims_f:
+            print('Warning: mode does not keep dimension')
+        return lambda a, axis=axis_f, keepdims=keepdims_f: mode(a, axis=axis)
     else:
         raise KeyError(agg_name)

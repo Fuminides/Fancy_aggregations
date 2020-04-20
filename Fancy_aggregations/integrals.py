@@ -24,7 +24,7 @@ To suggest changes or submit new code please use the github page.
 """
 
 import numpy as np
-import Fancy_aggregations.tnorms as tnorms
+from . import tnorms
 # =============================================================================
 # ~ MEASURES
 # =============================================================================

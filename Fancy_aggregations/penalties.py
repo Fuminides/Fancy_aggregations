@@ -15,23 +15,32 @@ import numpy as np
 # =============================================================================
 # ~ PENALTY
 # =============================================================================
-
-def penalty_aggregation(X, agg_functions):
+def penalty_aggregation(X, agg_functions, axis=0, keepdims=True):
     '''
 
     :param X:
     :param agg_functions:
     :return:
     '''
-    min_distances = np.Inf
-    res = -1
+    agg_matrix = []
+    agg_distances_shape =  [len(agg_functions)] + list(agg_functions[0](X, axis=axis, keepdims=False).shape)
+    agg_distances = np.zeros(agg_distances_shape)
 
-    for ag_f in agg_functions:
-        aux = ag_f(X)
-        distance = np.sum(np.abs(X - aux))
 
-        if distance < min_distances:
-            res = aux
-            min_distances = distance
+    for ix, ag_f in enumerate(agg_functions):
+        aux = ag_f(X, axis=axis, keepdims=True)
+        distances = np.sum(np.abs(X - aux), axis=axis, keepdims=False)
+        aux = ag_f(X, axis=axis, keepdims=False)
+
+        agg_matrix.append(aux)
+        agg_distances[ix] = distances
+
+    agg_choose = np.argmin(agg_distances, axis=0)
+    res = np.zeros(agg_choose.shape)
+    for index, x in np.ndenumerate(agg_choose):
+        res[index] = agg_matrix[x][index]
+
+    if keepdims:
+        res =  res= np.expand_dims(res, axis=axis)
 
     return res
