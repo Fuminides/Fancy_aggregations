@@ -14,7 +14,7 @@ from . import networks
 from . import owas
 from . import overlaps
 
-supported_functions = ['mean', 'median', 'min', 'max', 'md', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'sinoverlap', 'hmean', 'lucrezia']
+supported_functions = ['mean', 'median', 'min', 'max', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'sinoverlap', 'hmean']
 
 def parse(agg_name, axis_f = 0, keepdims_f=True):
     agg_minuscula = agg_name.lower()

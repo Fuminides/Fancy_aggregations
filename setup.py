@@ -10,7 +10,7 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
    name='Fancy_aggregations',
-   version='1.3.0',
+   version='1.3.2',
    description='A collection of aggregations, such as OWAs, Choquet and Sugeno integrals, etc.',
    author='Javier Fumanal Idocin',
    url='https://github.com/Fuminides/Fancy_aggregations',

@@ -12,10 +12,33 @@ To suggest changes or submit new code please use the github page.
 
 import numpy as np
 
+
+# =============================================================================
+# ~ Cost functions
+# =============================================================================
+# They all sould hold the interface: (real, yhat, axis) as inputs.
+# 
+def _cuadratic_cost(real, yhat, axis):
+	return np.sum((real - yhat) * (real - yhat), axis=axis, keepdims=False)
+
+def _huber_cost(real, yhat, axis, M=0.3):
+	r2_cost = _cuadratic_cost(real, yhat, axis)
+	root_cost = np.sqrt(r2_cost)
+	outlier_detected = root_cost > M
+
+	outlier_costs = 2 * M * root_cost - M * M
+
+	return root_cost * (1 - outlier_detected) + outlier_costs * outlier_detected
+
+def _optimistic_cost(real, yhat, axis):
+	return np.sum(1 - yhat, axis=axis, keepdims=False)
+
+def _realistic_optimistic_cost(real, yhat, axis):
+	return np.sum(np.max(real, axis=axis, keepdims=True) - yhat, axis=axis, keepdims=False)
 # =============================================================================
 # ~ PENALTY
 # =============================================================================
-def penalty_aggregation(X, agg_functions, axis=0, keepdims=True):
+def penalty_aggregation(X, agg_functions, axis=0, keepdims=True, cost=_cuadratic_cost):
     '''
 
     :param X:
@@ -29,7 +52,7 @@ def penalty_aggregation(X, agg_functions, axis=0, keepdims=True):
 
     for ix, ag_f in enumerate(agg_functions):
         aux = ag_f(X, axis=axis, keepdims=True)
-        distances = np.sum(np.abs(X - aux), axis=axis, keepdims=False)
+        distances = cost(X, aux, axis)
         aux = ag_f(X, axis=axis, keepdims=False)
 
         agg_matrix.append(aux)
