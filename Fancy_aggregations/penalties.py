@@ -35,6 +35,9 @@ def _optimistic_cost(real, yhat, axis):
 
 def _realistic_optimistic_cost(real, yhat, axis):
 	return np.sum(np.max(real, axis=axis, keepdims=True) - yhat, axis=axis, keepdims=False)
+
+
+cost_functions = [_cuadratic_cost, _huber_cost, _optimistic_cost, _realistic_optimistic_cost]
 # =============================================================================
 # ~ PENALTY
 # =============================================================================
