@@ -21,6 +21,9 @@ import numpy as np
 def _cuadratic_cost(real, yhat, axis):
 	return np.sum((real - yhat) * (real - yhat), axis=axis, keepdims=False)
 
+def _anti_cuadratic_cost(real, yhat, axis):
+    return np.sum(1 - (real - yhat) * (real - yhat), axis=axis, keepdims=False)
+
 def _huber_cost(real, yhat, axis, M=0.3):
 	r2_cost = _cuadratic_cost(real, yhat, axis)
 	root_cost = np.sqrt(r2_cost)
@@ -49,7 +52,7 @@ def _realistic_pesimistic_cost(real, yhat, axis):
     return np.sum(yhat - np.min(real, axis=axis, keepdims=True), axis=axis, keepdims=False)
 
 
-cost_functions = [_cuadratic_cost, _huber_cost, _optimistic_cost, _realistic_optimistic_cost, _pesimitic_cost, _realistic_pesimistic_cost, _class_cost, _random_cost]
+cost_functions = [_cuadratic_cost, _anti_cuadratic_cost, _huber_cost, _optimistic_cost, _realistic_optimistic_cost, _pesimitic_cost, _realistic_pesimistic_cost, _class_cost, _random_cost]
 # =============================================================================
 # ~ PENALTY
 # =============================================================================
