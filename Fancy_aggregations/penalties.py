@@ -30,8 +30,11 @@ def _huber_cost(real, yhat, axis, M=0.3):
 
 	return root_cost * (1 - outlier_detected) + outlier_costs * outlier_detected
 
-def _class_cost(real, yhat, axis):
+def _random_cost(real, yhat, axis):
     return np.sum(np.abs(0.5 - yhat), axis=axis, keepdims=False)
+
+def _class_cost(real, yhat, axis):
+    return np.sum(1 - np.abs(0.5 - yhat), axis=axis, keepdims=False)
 
 def _optimistic_cost(real, yhat, axis):
 	return np.sum(1 - yhat, axis=axis, keepdims=False)
@@ -46,7 +49,7 @@ def _realistic_pesimistic_cost(real, yhat, axis):
     return np.sum(yhat - np.min(real, axis=axis, keepdims=True), axis=axis, keepdims=False)
 
 
-cost_functions = [_cuadratic_cost, _huber_cost, _optimistic_cost, _realistic_optimistic_cost, _pesimitic_cost, _realistic_pesimistic_cost, _class_cost]
+cost_functions = [_cuadratic_cost, _huber_cost, _optimistic_cost, _realistic_optimistic_cost, _pesimitic_cost, _realistic_pesimistic_cost, _class_cost, _random_cost]
 # =============================================================================
 # ~ PENALTY
 # =============================================================================
