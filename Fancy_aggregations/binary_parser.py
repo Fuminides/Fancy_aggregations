@@ -14,7 +14,8 @@ from . import networks
 from . import owas
 from . import overlaps
 
-supported_functions = ['mean', 'median', 'min', 'max', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'sinoverlap', 'hmean']
+supported_functions = ['mean', 'median', 'min', 'max', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'sinoverlap', 'hmean',
+                'hamacher', 'luka', 'drastic', 'nilpotent', 'probabilistic_sum', 'bounded_sum', 'drastic_tcnorm', 'nilpotent_maximum', 'einstein_sum']
 
 def parse(agg_name, axis_f = 0, keepdims_f=True):
     agg_minuscula = agg_name.lower()
@@ -54,8 +55,24 @@ def parse(agg_name, axis_f = 0, keepdims_f=True):
         return lambda a, axis=axis_f, keepdims=keepdims_f: overlaps.sin_overlap(a, axis=axis, keepdims=keepdims)
     elif agg_minuscula == 'hmean':
         return lambda a, axis=axis_f, keepdims=keepdims_f: overlaps.harmonic_mean(a, axis=axis, keepdims=keepdims)
-    elif agg_minuscula == 'lucrezia':
-        return lambda a, axis=axis_f, keepdims=keepdims_f: networks.lucrezia_simple_decisor(a, axis=axis, keepdims=keepdims, tnorm=np.minimum, agg_function=np.mean)
+    elif agg_minuscula == 'hamacher':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.hamacher_tnorm(a, axis=axis, keepdims=keepdims)
+    elif agg_minuscula == 'luka':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.lukasiewicz_tnorm(a, axis=axis, keepdims=keepdims)
+    elif agg_minuscula == 'drastic':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.drastic_tnorm(a, axis=axis, keepdims=keepdims)           
+    elif agg_minuscula == 'nilpotent':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.nilpotent_tnorm(a, axis=axis, keepdims=keepdims)
+    elif agg_minuscula == 'probabilistic_sum':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.probabilistc_sum(a, axis=axis, keepdims=keepdims)    
+    elif agg_minuscula == 'bounded_sum':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.bounded_sum(a, axis=axis, keepdims=keepdims)
+    elif agg_minuscula == 'drastic_tcnorm':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.drastic_tcnorm(a, axis=axis, keepdims=keepdims)
+    elif agg_minuscula == 'nilpotent_maximum':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.nilpotent_maximum(a, axis=axis, keepdims=keepdims)
+    elif agg_minuscula == 'einstein_sum':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.einstein_sum(a, axis=axis, keepdims=keepdims)
     elif agg_minuscula == 'mode':
         from scipy.stats import mode
         if keepdims_f:

@@ -30,18 +30,27 @@ def _huber_cost(real, yhat, axis, M=0.3):
 
 	return root_cost * (1 - outlier_detected) + outlier_costs * outlier_detected
 
+def _class_cost(real, yhat, axis):
+    return np.sum(np.abs(0.5 - yhat), axis=axis, keepdims=False)
+
 def _optimistic_cost(real, yhat, axis):
 	return np.sum(1 - yhat, axis=axis, keepdims=False)
 
 def _realistic_optimistic_cost(real, yhat, axis):
 	return np.sum(np.max(real, axis=axis, keepdims=True) - yhat, axis=axis, keepdims=False)
 
+def _pesimitic_cost(real, yhat, axis):
+    return np.sum(yhat, axis=axis, keepdims=False)
 
-cost_functions = [_cuadratic_cost, _huber_cost, _optimistic_cost, _realistic_optimistic_cost]
+def _realistic_pesimistic_cost(real, yhat, axis):
+    return np.sum(yhat - np.min(real, axis=axis, keepdims=True), axis=axis, keepdims=False)
+
+
+cost_functions = [_cuadratic_cost, _huber_cost, _optimistic_cost, _realistic_optimistic_cost, _pesimitic_cost, _realistic_pesimistic_cost, _class_cost]
 # =============================================================================
 # ~ PENALTY
 # =============================================================================
-def penalty_aggregation(X, agg_functions, axis=0, keepdims=True, cost=_cuadratic_cost):
+def penalty_aggregation(X, agg_functions, axis=0, keepdims=False, cost=_cuadratic_cost):
     '''
 
     :param X:

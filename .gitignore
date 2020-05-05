@@ -1,2 +1,23 @@
 
 *.pyc
+build/lib/Fancy_aggregations/binary_parser.py
+build/lib/Fancy_aggregations/__init__.py
+build/lib/Fancy_aggregations/implications.py
+build/lib/Fancy_aggregations/integrals.py
+build/lib/Fancy_aggregations/intervals.py
+build/lib/Fancy_aggregations/moderate_deviations.py
+build/lib/Fancy_aggregations/networks.py
+build/lib/Fancy_aggregations/overlaps.py
+build/lib/Fancy_aggregations/owas.py
+build/lib/Fancy_aggregations/penalties.py
+build/lib/Fancy_aggregations/rankings.py
+build/lib/Fancy_aggregations/tnorms.py
+dist/Fancy_aggregations-1.3.0-py3.7.egg
+dist/Fancy_aggregations-1.3.0.tar.gz
+dist/Fancy_aggregations-1.3.1.tar.gz
+dist/Fancy_aggregations-1.3.2-py3.7.egg
+dist/Fancy_aggregations-1.3.2.tar.gz
+Fancy_aggregations.egg-info/dependency_links.txt
+Fancy_aggregations.egg-info/PKG-INFO
+Fancy_aggregations.egg-info/requires.txt
+Fancy_aggregations.egg-info/SOURCES.txt
