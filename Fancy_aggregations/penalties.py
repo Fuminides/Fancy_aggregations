@@ -52,7 +52,7 @@ def _realistic_pesimistic_cost(real, yhat, axis):
     return np.sum(yhat - np.min(real, axis=axis, keepdims=True), axis=axis, keepdims=False)
 
 def _convex_comb(f1, f2, alpha0=0.5):
-    return lambda real, yhat, axis, alpha=alpha0: f1(a, yhat, axis) * alpha + f2(a, yhat, axis) * (1 - alpha)
+    return lambda real, yhat, axis, alpha=alpha0: f1(real, yhat, axis) * alpha + f2(real, yhat, axis) * (1 - alpha)
 
 #cost_functions = [_cuadratic_cost, _anti_cuadratic_cost, _huber_cost, _optimistic_cost, _realistic_optimistic_cost, _pesimitic_cost, _realistic_pesimistic_cost, _class_cost, _random_cost]
 cost_functions = [_convex_comb(_anti_cuadratic_cost, _realistic_optimistic_cost), _convex_comb(_anti_cuadratic_cost, _optimistic_cost),
