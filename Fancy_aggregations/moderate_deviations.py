@@ -115,7 +115,7 @@ def moderate_deviation_eq(X, D=distance_f1, Mp=1, Mn=1):
 
     return y1, y2
 
-def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_f):
+def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_f, Mp=1, Mn=10):
     '''
     Designed to use the md functions using the same interface as the rest of the numpy aggregation functions.
     IT ONLY WORKS IN 3 DIMENSIONAL ARRAY (features, samples, classes)
