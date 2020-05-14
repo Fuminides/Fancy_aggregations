@@ -83,13 +83,13 @@ def cut_point(D, x_sigma, Mp, Mn):
                 k = ix
     return k
 
-def moderate_deviation_f(X, D=distance_f2, Mp=1, Mn=1):
+def moderate_deviation_f(X, D=distance_f2, Mp=1, Mn=1, axis=0):
     '''
 
 
     '''
     n = len(X)
-    x_sigma = np.sort(X)
+    x_sigma = np.sort(X, axis=0)
     k = cut_point(D, x_sigma, Mp, Mn)
 
     f = (Mp * np.sum(x_sigma[0:k+1]) + Mn*np.sum(x_sigma[k+1:])) / (k*Mp + (n - k)*Mn)
@@ -145,6 +145,7 @@ def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_f, M
 
     if axis != 0:
         X = np.transpose(X, (0, axis))
+
 
     return result
 

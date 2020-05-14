@@ -19,37 +19,33 @@ import numpy as np
 # They all sould hold the interface: (real, yhat, axis) as inputs.
 # 
 def _cuadratic_cost(real, yhat, axis):
-	return np.sum((real - yhat) * (real - yhat), axis=axis, keepdims=False)
+	return np.sum((real - yhat)**2, axis=axis, keepdims=False)
 
 def _anti_cuadratic_cost(real, yhat, axis):
-    return np.sum(1 - (real - yhat) * (real - yhat), axis=axis, keepdims=False)
+    return np.sum(1 - (real - yhat)**2, axis=axis, keepdims=False)
 
 def _huber_cost(real, yhat, axis, M=0.3):
 	r2_cost = _cuadratic_cost(real, yhat, axis)
-	root_cost = np.sqrt(r2_cost)
-	outlier_detected = root_cost > M
+	outlier_detected = r2_cost > M
 
-	outlier_costs = 2 * M * root_cost - M * M
+	outlier_costs = 2 * M * r2_cost - M * M
 
-	return root_cost * (1 - outlier_detected) + outlier_costs * outlier_detected
+	return r2_cost * (1 - outlier_detected) + outlier_costs * outlier_detected
 
 def _random_cost(real, yhat, axis):
-    return np.sum(np.abs(0.5 - yhat), axis=axis, keepdims=False)
-
-def _class_cost(real, yhat, axis):
-    return np.sum(1 - np.abs(0.5 - yhat), axis=axis, keepdims=False)
+    return np.sum((0.5 - yhat)**2, axis=axis, keepdims=False)
 
 def _optimistic_cost(real, yhat, axis):
 	return np.sum(1 - yhat, axis=axis, keepdims=False)
 
 def _realistic_optimistic_cost(real, yhat, axis):
-	return np.sum(np.max(real, axis=axis, keepdims=True) - yhat, axis=axis, keepdims=False)
+	return np.sum((np.max(real, axis=axis, keepdims=True) - yhat)**2, axis=axis, keepdims=False)
 
 def _pesimitic_cost(real, yhat, axis):
     return np.sum(yhat, axis=axis, keepdims=False)
 
 def _realistic_pesimistic_cost(real, yhat, axis):
-    return np.sum(yhat - np.min(real, axis=axis, keepdims=True), axis=axis, keepdims=False)
+    return np.sum((yhat - np.min(real, axis=axis, keepdims=True))**2, axis=axis, keepdims=False)
 
 def _convex_comb(f1, f2, alpha0=0.5):
     return lambda real, yhat, axis, alpha=alpha0: f1(real, yhat, axis) * alpha + f2(real, yhat, axis) * (1 - alpha)
@@ -57,7 +53,7 @@ def _convex_comb(f1, f2, alpha0=0.5):
 def _func_base_cost(agg):
     return lambda real, yhat, axis: np.abs(agg(real, axis=axis) - yhat)
 
-base_cost_functions = [_cuadratic_cost, _anti_cuadratic_cost, _huber_cost, _optimistic_cost, _realistic_optimistic_cost, _pesimitic_cost, _realistic_pesimistic_cost, _class_cost, _random_cost]
+base_cost_functions = [_cuadratic_cost, _anti_cuadratic_cost, _huber_cost, _realistic_optimistic_cost, _realistic_pesimistic_cost, _random_cost]
 
 cost_functions = [_convex_comb(_anti_cuadratic_cost, _realistic_optimistic_cost), _convex_comb(_anti_cuadratic_cost, _optimistic_cost),
  _convex_comb(_cuadratic_cost, _realistic_optimistic_cost), _convex_comb(_huber_cost, _optimistic_cost),
@@ -99,7 +95,8 @@ def penalty_aggregation(X, agg_functions, axis=0, keepdims=False, cost=_cuadrati
 
 def penalty_optimization(X, agg_functions, axis=0, keepdims=False, cost=_cuadratic_cost):
     '''
-
+    EXPERIMENTAL: instead of computing the penalty function using aggregation functions,
+    it uses an optimization algorithm to reduce the cost. (More costly)
     :param X:
     :param agg_functions:
     :return:
@@ -107,44 +104,12 @@ def penalty_optimization(X, agg_functions, axis=0, keepdims=False, cost=_cuadrat
     from scipy.optimize import minimize, dual_annealing, basinhopping
     minimizer_kwargs = {"method":"L-BFGS-B"}
 
-    def _fast_montecarlo_optimization(function_alpha, x0=[0.5], minimizer_kwargs=None, niter=200):
-        '''
-        Just randomly samples the function. More functionality might come in the future if necessary.
-        '''
-        class dummy_plug:
-            def _init(self, x=None):
-                self.x = x
-            
-        iter_actual = 0
-    
-        #epsilon = 0.05
-        eval_per_iter = 10
-        best_fitness = 1
-        resultado = dummy_plug()
-        
-        while(iter_actual < niter):
-            subjects = np.random.random_sample((eval_per_iter, len(x0)))
-            fitness = [function_alpha(x) for x in subjects]
-            ordered = np.sort(fitness)
-            arg_ordered = np.argsort(fitness)
-            iter_actual += 1
-            
-            if ordered[1] < best_fitness:
-                best_fitness = ordered[1]
-                resultado.x = subjects[arg_ordered[1], :]
-                
-                if best_fitness == 0.0:
-                    return resultado
-           
-    
-        return resultado
+    init_pop = np.random.normal(0.5, 0.25, X.shape[np.arange(len(X.shape))!=axis])
+    function_alpha = lambda yhat: cost(X, yhat, axis=axis)
+    res = basinhopping(function_alpha, x0=init_pop, minimizer_kwargs=minimizer_kwargs, niter=100)
 
-        init_pop = np.random.normal(0.5, 0.25, X.shape[np.arange(len(X.shape))!=axis])
-        function_alpha = lambda yhat: cost(X, yhat, axis=axis)
-        res = basinhopping(function_alpha, x0=init_pop, minimizer_kwargs=minimizer_kwargs, niter=100)
-    
-        if keepdims:
-            res =  res= np.expand_dims(res, axis=axis)
-    
-        return res.x
+    if keepdims:
+        res =  res= np.expand_dims(res, axis=axis)
+
+    return res.x
 
