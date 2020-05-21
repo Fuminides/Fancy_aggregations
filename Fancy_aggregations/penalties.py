@@ -36,13 +36,13 @@ def _random_cost(real, yhat, axis):
     return np.sum((0.5 - yhat)**2, axis=axis, keepdims=False)
 
 def _optimistic_cost(real, yhat, axis):
-	return np.sum(1 - yhat, axis=axis, keepdims=False)
+	return np.sum((1 - yhat)**2, axis=axis, keepdims=False)
 
 def _realistic_optimistic_cost(real, yhat, axis):
 	return np.sum((np.max(real, axis=axis, keepdims=True) - yhat)**2, axis=axis, keepdims=False)
 
 def _pesimitic_cost(real, yhat, axis):
-    return np.sum(yhat, axis=axis, keepdims=False)
+    return np.sum(yhat**2, axis=axis, keepdims=False)
 
 def _realistic_pesimistic_cost(real, yhat, axis):
     return np.sum((yhat - np.min(real, axis=axis, keepdims=True))**2, axis=axis, keepdims=False)
@@ -53,7 +53,7 @@ def _convex_comb(f1, f2, alpha0=0.5):
 def _func_base_cost(agg):
     return lambda real, yhat, axis: np.abs(agg(real, axis=axis) - yhat)
 
-base_cost_functions = [_cuadratic_cost, _anti_cuadratic_cost, _huber_cost, _realistic_optimistic_cost, _realistic_pesimistic_cost, _random_cost]
+base_cost_functions = [_cuadratic_cost, _realistic_optimistic_cost, _random_cost, _anti_cuadratic_cost, _huber_cost, _realistic_pesimistic_cost]
 
 cost_functions = [_convex_comb(_anti_cuadratic_cost, _realistic_optimistic_cost), _convex_comb(_anti_cuadratic_cost, _optimistic_cost),
  _convex_comb(_cuadratic_cost, _realistic_optimistic_cost), _convex_comb(_huber_cost, _optimistic_cost),
@@ -101,7 +101,7 @@ def penalty_optimization(X, agg_functions, axis=0, keepdims=False, cost=_cuadrat
     :param agg_functions:
     :return:
     '''
-    from scipy.optimize import minimize, dual_annealing, basinhopping
+    from scipy.optimize import basinhopping
     minimizer_kwargs = {"method":"L-BFGS-B"}
 
     init_pop = np.random.normal(0.5, 0.25, X.shape[np.arange(len(X.shape))!=axis])
