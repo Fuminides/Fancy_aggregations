@@ -19,10 +19,10 @@ import numpy as np
 # They all sould hold the interface: (real, yhat, axis) as inputs.
 # 
 def _cuadratic_cost(real, yhat, axis):
-	return np.sum((real - yhat)**2, axis=axis, keepdims=False)
+	return np.mean((real - yhat)**2, axis=axis, keepdims=False)
 
 def _anti_cuadratic_cost(real, yhat, axis):
-    return np.sum(1 - (real - yhat)**2, axis=axis, keepdims=False)
+    return np.mean(1 - (real - yhat)**2, axis=axis, keepdims=False)
 
 def _huber_cost(real, yhat, axis, M=0.3):
 	r2_cost = _cuadratic_cost(real, yhat, axis)
@@ -33,33 +33,36 @@ def _huber_cost(real, yhat, axis, M=0.3):
 	return r2_cost * (1 - outlier_detected) + outlier_costs * outlier_detected
 
 def _random_cost(real, yhat, axis):
-    return np.sum((0.5 - yhat)**2, axis=axis, keepdims=False)
+    return np.mean((0.5 - yhat)**2, axis=axis, keepdims=False)
 
 def _optimistic_cost(real, yhat, axis):
-	return np.sum((1 - yhat)**2, axis=axis, keepdims=False)
+	return np.mean((1 - yhat)**2, axis=axis, keepdims=False)
 
 def _realistic_optimistic_cost(real, yhat, axis):
-	return np.sum((np.max(real, axis=axis, keepdims=True) - yhat)**2, axis=axis, keepdims=False)
+	return np.mean((np.max(real, axis=axis, keepdims=True) - yhat)**2, axis=axis, keepdims=False)
 
-def _pesimitic_cost(real, yhat, axis):
-    return np.sum(yhat**2, axis=axis, keepdims=False)
+def _pessimistic_cost(real, yhat, axis):
+    return np.mean(yhat**2, axis=axis, keepdims=False)
 
 def _realistic_pesimistic_cost(real, yhat, axis):
-    return np.sum((yhat - np.min(real, axis=axis, keepdims=True))**2, axis=axis, keepdims=False)
+    return np.mean((yhat - np.min(real, axis=axis, keepdims=True))**2, axis=axis, keepdims=False)
 
 def _convex_comb(f1, f2, alpha0=0.5):
     return lambda real, yhat, axis, alpha=alpha0: f1(real, yhat, axis) * alpha + f2(real, yhat, axis) * (1 - alpha)
+
+def _convex_quasi_comb(f1, f2, alpha0=0.5):
+    return lambda real, yhat, axis, alpha=alpha0: np.minimum((f1(real, yhat, axis) * alpha + f2(real, yhat, axis) * (1 - alpha))/(1 - alpha),1)
 
 def _func_base_cost(agg):
     return lambda real, yhat, axis: np.abs(agg(real, axis=axis) - yhat)
 
 base_cost_functions = [_cuadratic_cost, _realistic_optimistic_cost, _random_cost, _anti_cuadratic_cost, _huber_cost, _realistic_pesimistic_cost]
 
-cost_functions = [_convex_comb(_anti_cuadratic_cost, _realistic_optimistic_cost), _convex_comb(_anti_cuadratic_cost, _optimistic_cost),
- _convex_comb(_cuadratic_cost, _realistic_optimistic_cost), _convex_comb(_huber_cost, _optimistic_cost),
- _convex_comb(_random_cost, _anti_cuadratic_cost), _convex_comb(_huber_cost, _realistic_pesimistic_cost),
-  _convex_comb(_realistic_pesimistic_cost, _realistic_optimistic_cost), _convex_comb(_cuadratic_cost, _realistic_pesimistic_cost)
-]
+cost_functions = [_convex_comb(_cuadratic_cost, _realistic_optimistic_cost),
+ _convex_comb(_huber_cost, _realistic_optimistic_cost), 
+ _convex_quasi_comb(_anti_cuadratic_cost, _optimistic_cost),
+ _convex_quasi_comb(_huber_cost, _anti_cuadratic_cost)]
+
 # =============================================================================
 # ~ PENALTY
 # =============================================================================
