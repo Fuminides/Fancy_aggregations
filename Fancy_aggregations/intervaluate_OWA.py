@@ -33,15 +33,15 @@ def iowa(X,axis=0, keepdims=False, w=None, alpha_order=0.5, beta_order=0.1):
         
         return res
     
-def std_iowa(X, axis=0, keepdims=False, alpha_order=0.5, beta_oder=0.1, a=0.1, b=0.5):
+def std_iowa(X, axis=0, keepdims=False, alpha_order=0.5, beta_order=0.1, a=0.1, b=0.5):
     w = _owa.generate_owa_weights(X.shape[axis], lambda x: _owa.std_quantifier(x, a=a, b=b))
-    return iowa(X, axis=axis, keepdims=keepdims, alpha_order=alpha_order, beta_order=beta_oder, w=w)
+    return iowa(X, axis=axis, keepdims=keepdims, alpha_order=alpha_order, beta_order=beta_order, w=w)
 
-def iowa1(X, axis=0, keepdims=False, alpha_order=0.5, beta_oder=0.1):
-    return std_iowa(X, axis, keepdims, alpha_order, beta_oder, 0.1, 0.5)
+def iowa1(X, axis=0, keepdims=False, alpha_order=0.5, beta_order=0.1):
+    return std_iowa(X, axis, keepdims, alpha_order, beta_order, 0.1, 0.5)
 
-def iowa2(X, axis=0, keepdims=False, alpha_order=0.5, beta_oder=0.1):
-    return std_iowa(X, axis, keepdims, alpha_order, beta_oder, 0.5, 1)
+def iowa2(X, axis=0, keepdims=False, alpha_order=0.5, beta_order=0.1):
+    return std_iowa(X, axis, keepdims, alpha_order, beta_order, 0.5, 1)
 
-def iowa3(X, axis=0, keepdims=False, alpha_order=0.5, beta_oder=0.1):
-    return std_iowa(X, axis, keepdims, alpha_order, beta_oder, 0.3, 0.8)
+def iowa3(X, axis=0, keepdims=False, alpha_order=0.5, beta_order=0.1):
+    return std_iowa(X, axis, keepdims, alpha_order, beta_order, 0.3, 0.8)
