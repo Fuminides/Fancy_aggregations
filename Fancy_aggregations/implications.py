@@ -13,7 +13,7 @@ def kleese_dienes_implication(x, y):
     return max(1 - x, y)
 
 
-def reinchenbag_implication(x, y):
+def reichenbach_implication(x, y):
     """Performs pairwise the reinchenbag implication."""
     return 1 - x + x * y
 

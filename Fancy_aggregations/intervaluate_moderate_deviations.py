@@ -17,12 +17,10 @@ def _d2(x, y, Mp, Mn):
     else:
         return Mn * (y**2 - x**2)
 
-def md_2(intervalued_logits, Mp=10, Mn=20, deviation_function=_d2):
-    global alpha_order, beta_order
-    
+def md_2(intervalued_logits, Mp=10, Mn=20, deviation_function=_d2, alpha_order=0.5, beta_order=0.1):  
     # sort interval according to alpha and beta
     n = intervalued_logits.shape[0]
-    increasing_iv = np.array(sorted(intervalued_logits, key=lambda iv: (iv[1] * alpha_order + (1-alpha_order)*iv[0], iv[1] * beta_order + (1-beta_order)*iv[0])))
+    increasing_iv = np.array(sorted(intervalued_logits, key=lambda a: (_iv.k_alpha_operator(a, alpha_order), _iv.k_alpha_operator(a, beta_order))))
     
     min_width = min(intervalued_logits[:,1] - intervalued_logits[:,0])
         # calculate switch point
@@ -48,8 +46,7 @@ def _d5(x, y, Mp, Mn):
     else:
         return Mn * (y**2 - x**2)
     
-def md_5(intervalued_logits, Mp=10, Mn=20, deviation_function=_d5):
-    global alpha_order, beta_order
+def md_5(intervalued_logits, Mp=10, Mn=20, deviation_function=_d5, alpha_order=0.5, beta_order=0.1):
     
     # sort interval according to alpha and beta
     n = intervalued_logits.shape[0]
@@ -88,7 +85,7 @@ def md_5(intervalued_logits, Mp=10, Mn=20, deviation_function=_d5):
     
     return np.array([k_alpha_y - alpha_order * min_width, k_alpha_y - alpha_order * min_width + min_width])
 
-def md_interval_aggregation(X, axis=0, keepdims=False, md=md_5):
+def md_interval_aggregation(X, axis=0, keepdims=False, md=md_5, alpha_order=0.5, beta_order=0.1, Mp=10, Mn=20):
     '''
     Performs the md intervalued aggregation.
     
@@ -110,7 +107,7 @@ def md_interval_aggregation(X, axis=0, keepdims=False, md=md_5):
         idx = np.ndindex(X.shape[:-2])
         
         for index in idx:
-            res[index] = md(X[index])
+            res[index] = md(X[index], Mp=Mp, Mn=Mn, alpha_order=alpha_order, beta_order=beta_order)
             
         if axis != len(X.shape)-2:
             res = np.swapaxes(res, axis, len(res.shape)-2)

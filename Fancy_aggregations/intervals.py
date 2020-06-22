@@ -20,12 +20,12 @@ from . import implications as _imp
 def k_alpha_operator(a, alpha_order):
     return a[1] * alpha_order + (1-alpha_order)*a[0]
     
-def intervaluate(x, y, implication_operator=_imp.reinchenbag_implication):
+def intervaluate(x, y, implication_operator=_imp.reichenbach_implication):
     """Returns an array with the interval composed using x, y and an implication operador.
         The new dimension is appended at the end of the array."""
     res = np.zeros((list(x.shape) + [2]))
-    res[..., 0] = implication_operator(x, y)
-    res[..., 1] = implication_operator(x, y) + y
+    res[..., 0] = 1 - implication_operator(x, y)
+    res[..., 1] = 1 - implication_operator(x, y) + y
     return res
 
 def admissible_k_alpha_order(interval, interval2, alpha=0.5, beta=0.1):
