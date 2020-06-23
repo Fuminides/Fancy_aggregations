@@ -70,6 +70,7 @@ def md_5(intervalued_logits, Mp=10, Mn=20, deviation_function=_d5, alpha_order=0
     c = Mp * sum(skalphas[:k]) - Mn * sum(skalphas[k:])
     if a == 0:
         sol = -c / b
+        k_alpha_y = sol
     elif b == 0:
         sol = np.sqrt(-c / a)
         if k_alphas[k-1] <= sol < k_alphas[k]:
