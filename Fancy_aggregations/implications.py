@@ -6,6 +6,8 @@ File containing different implication operators.
 
 To suggest changes or submit new code please use the github page.
 """
+import numpy as np
+
 def kleese_dienes_implication(x, y):
     '''
     Performs pairwise the kleese_dienes implication.
