@@ -10,7 +10,7 @@ def kleese_dienes_implication(x, y):
     '''
     Performs pairwise the kleese_dienes implication.
     '''
-    return max(1 - x, y)
+    return np.maximum(1 - x, y)
 
 
 def reichenbach_implication(x, y):
@@ -20,7 +20,7 @@ def reichenbach_implication(x, y):
 
 def luka_implication(x, y):
     """Performs pairwise the Lukasiewicz implication."""
-    return min(1, 1 - x + y)
+    return np.minimum(1, 1 - x + y)
 
 def lukasiewicz_implication(x, y):
     """Performs pairwise the Lukasiewicz implication."""
