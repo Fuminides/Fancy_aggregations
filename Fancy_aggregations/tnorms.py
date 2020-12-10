@@ -112,7 +112,14 @@ def v_tnorm(x, tnorm=None, axis=0, keepdims=False):
                 acum_norm = tnorm(acum_norm, X[ix+1])
 
         return acum_norm
+    original_shape = x.shape
 
+    if original_shape[axis] == 1:
+        if not keepdims:
+            return np.mean(x, axis=axis) #We jut delete that dimension
+        else:
+            return x
+            
     res = np.apply_along_axis(tnorm_1D, axis, x, tnorm)
 
     if keepdims:
