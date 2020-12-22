@@ -81,14 +81,6 @@ def averaging_operator_min_delta_1d(x, tnorm=np.min, purge_0=True):
 
     return min_x + t_norm_res
 
-def averaging_operator_min_delta(x, axis, keepdims, tnorm=np.min, purge_0=True):
-    res = np.apply_along_axis(averaging_operator_min_delta_1d, axis, x, tnorm=tnorm, purge_0=purge_0)
-
-    if keepdims:
-        res = np.expand_dims(res, axis=axis)
-
-    return res
-
 def averaging_operator_max_delta_1d(x, tnorm, purge_0=True):
     if purge_0:
         x = x[~_my_is_close(x, np.zeros(len(x)))]
@@ -109,3 +101,20 @@ def averaging_operator_max_delta_1d(x, tnorm, purge_0=True):
         t_norm_res = tnorm(x_1_n - min_x)
 
     return np.max(x) - t_norm_res
+    
+def averaging_operator_min_delta(x, axis, keepdims, tnorm=np.min, purge_0=True):
+    res = np.apply_along_axis(averaging_operator_min_delta_1d, axis, x, tnorm=tnorm, purge_0=purge_0)
+
+    if keepdims:
+        res = np.expand_dims(res, axis=axis)
+
+    return res
+
+def averaging_operator_max_delta(x, axis, keepdims, tnorm=np.min, purge_0=True):
+    res = np.apply_along_axis(averaging_operator_max_delta_1d, axis, x, tnorm=tnorm, purge_0=purge_0)
+
+    if keepdims:
+        res = np.expand_dims(res, axis=axis)
+
+    return res
+
