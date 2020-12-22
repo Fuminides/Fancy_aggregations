@@ -30,3 +30,4 @@ from . import penalties
 from . import rankings
 from . import overlaps
 from . import binary_parser
+from . import averaging_tnorms
