@@ -90,7 +90,7 @@ def averaging_operator_max_delta_1d(x, tnorm, purge_0=True):
 
     min_x = np.max(x)  
     aux = np.zeros(len(x)) + min_x
-    x_1_n = x[~_my_is_close(x, aux)]
+    x_1_n = x[~np.array(_my_is_close(x, aux), dtype=bool)]
 
     if len(x_1_n) == 0:
         t_norm_res = 0.0
@@ -101,7 +101,7 @@ def averaging_operator_max_delta_1d(x, tnorm, purge_0=True):
         t_norm_res = tnorm(x_1_n - min_x)
 
     return np.max(x) - t_norm_res
-    
+
 def averaging_operator_min_delta(x, axis, keepdims, tnorm=np.min, purge_0=True):
     res = np.apply_along_axis(averaging_operator_min_delta_1d, axis, x, tnorm=tnorm, purge_0=purge_0)
 
