@@ -13,8 +13,11 @@ import numpy as np
 # =============================================================================
 # ~ T - NORMS
 # =============================================================================
-def prod(x, y):
-    return x * y
+def prod(x, y=None, axis=0, keepdims=False):
+    if y is None:
+        return np.prod(x, axis=axis, keepdims=keepdims)
+    else:
+        return x * y
     
 def hamacher_tnorm(x, y=None, axis=0, keepdims=False):
     '''
@@ -116,7 +119,7 @@ def v_tnorm(x, tnorm=None, axis=0, keepdims=False):
 
     if original_shape[axis] == 1:
         if not keepdims:
-            return np.mean(x, axis=axis) #We jut delete that dimension
+            return np.mean(x, axis=axis) #We must delete that dimension
         else:
             return x
             
@@ -128,6 +131,6 @@ def v_tnorm(x, tnorm=None, axis=0, keepdims=False):
 
     return res
 
-def fv_tnorm(tnorm):
+def fv_tnorm(tnorm, axis0=0):
     """Returns a vectorized tnorm given a pairwise tnorm."""
-    return lambda x: v_tnorm(x, tnorm)
+    return lambda x, axis=axis0: v_tnorm(x, tnorm, axis=axis)
