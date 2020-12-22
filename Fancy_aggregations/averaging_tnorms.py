@@ -10,7 +10,7 @@ To suggest changes or submit new code please use the github page.
 
 import numpy as np
 
-def v_isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
+def _v_isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
     """
     returns True if a is close in value to b. False otherwise
     :param a: one of the values to be tested
@@ -49,16 +49,19 @@ def _my_is_close(a, b):
   Computes isclose() from a naive perspective, and applying the math isclose() but in a vectorized way.
   
   '''   
+  a = np.squeeze(a)
+  b = np.squeeze(b)
+
   abs_dif = np.abs(a - b)
   c1 = np.less(abs_dif, 0.05)
-  c2 = v_isclose(a, b)
+  c2 = _v_isclose(a, b)
 
   return np.maximum(c1, c2)
 
   
 def averaging_operator_min_delta_1d(x, tnorm=np.min, purge_0=True):
     if purge_0:
-        x = _my_is_close(x, np.zeros(len(x)))
+        x = x[~_my_is_close(x, np.zeros(len(x)))]
 
         if len(x) == 0:
                 return 0.0
@@ -87,7 +90,7 @@ def averaging_operator_min_delta(x, axis, keepdims, tnorm=np.min, purge_0=True):
 
 def averaging_operator_max_delta_1d(x, tnorm):
     if purge_0:
-        x = _my_is_close(x, np.zeros(len(x)))
+        x = x[~_my_is_close(x, np.zeros(len(x)))]
 
         if len(x) == 0:
                 return 0.0
