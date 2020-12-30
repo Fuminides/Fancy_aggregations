@@ -10,12 +10,22 @@ import numpy as np
 from . import integrals
 from . import moderate_deviations
 from . import tnorms
-from . import networks
 from . import owas
 from . import overlaps
 
 supported_functions = ['mean', 'median', 'min', 'max', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'sinoverlap', 'hmean',
                 'hamacher', 'luka', 'drastic', 'nilpotent', 'probabilistic_sum', 'bounded_sum', 'drastic_tcnorm', 'nilpotent_maximum', 'einstein_sum']
+
+
+classic_aggs = ['mean', 'median', 'min', 'max']
+owa = ['owa1', 'owa2', 'owa3']
+fuzzy_integral = ['sugeno', 'choquet']
+choquet_family = ['choquet', 'cf', 'cf12', 'cfminmin']
+sugeno_family = ['sugeno', 'shamacher', 'fhamacher']
+tnorm = ['min', 'prod', 'hamacher', ' luka', 'drastic', 'nilpotent']
+tcnorm = ['probabilistic_sum', 'bounded_sum', 'drastic_tcnorm', 'nilpotent_maximum', 'einstein_sum']
+overlap = ['geomean', 'sinoverlap', 'hmean']
+
 
 def parse(agg_name, axis_f = 0, keepdims_f=True):
     agg_minuscula = agg_name.lower()
@@ -76,6 +86,9 @@ def parse(agg_name, axis_f = 0, keepdims_f=True):
         return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.nilpotent_maximum(a, axis=axis, keepdims=keepdims)
     elif agg_minuscula == 'einstein_sum':
         return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.einstein_sum(a, axis=axis, keepdims=keepdims)
+    elif agg_minuscula == 'prod':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: tnorms.prod(a, axis=axis, keepdims=keepdims)
+    
     elif agg_minuscula == 'mode':
         from scipy.stats import mode
         if keepdims_f:
