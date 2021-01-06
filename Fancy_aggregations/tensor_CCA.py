@@ -1,16 +1,37 @@
 import torch
 import numpy as np
 
+import torch.nn.functional as F
+
 def _differentiation_1_distance(X):
     #Perform differentiation for each consecuent point in the X dataset (time series)
-    filter = torch.nn.Conv1d(in_channels=1, out_channels=1, kernel_size=2, stride=1, padding=1, groups=1, bias=False)
-	kernel = np.array([-1.0, 1.0])
-	kernel = torch.from_numpy(kernel).view(1,1,2)
-	filter.weight.data = kernel
-	filter.weight.requires_grad = False
+    #Only for axis=0
+    X = X.permute(2, 1, 0)
+    aux =  X - F.pad(X, (1, 0))[:, :, :-1]
+    return aux.permute(2,1,0)
 
-    return filter(X)
-
+def diff(X):
+    '''
+    Only works for two shapes:
+    shape 1: experts, samples, classes
+    shape 2: experts1, experts2, samples, classes
+    '''
+    x_len = len(X.shape)
+    if x_len == 3:
+        return _differentiation_1_distance(X)
+    elif x_len == 4:
+        exp1, exp2, samples, clases = X.shape
+        X = X.reshape((exp1, exp2 * samples, clases))
+        aux = _differentiation_1_distance(X)
+        return aux.reshape((exp1, exp2, samples, clases))
+# =============================================================================
+# TNORMS
+# =============================================================================
+def hamacher_product(x, y):
+    return x*y / (x + y - x*y + 0.00000001) 
+# =============================================================================
+# INTEGRALS
+# =============================================================================
 def generate_cardinality(N, p = 2):
     '''
     Generate the cardinality measure for a N-sized vector.
@@ -32,7 +53,7 @@ def generate_cardinality_matrix(N, matrix_shape, p = 2):
     return res
 
 #ALL TORCH SUGENO IMPL ARE DIRECT TRANSLATIONS FROM THE NUMPY ONES
-def torch_sugeno(X, measure=None, axis = 0, f1 = torch.minimum, f2 = torch.amax, keepdims=True):
+def torch_sugeno(X, measure=None, axis = 0, f1 = torch.minimum, f2 = torch.amax, keepdims=False):
     '''
     Aggregates data using a generalization of the Choquet integral.
     
@@ -44,9 +65,9 @@ def torch_sugeno(X, measure=None, axis = 0, f1 = torch.minimum, f2 = torch.amax,
         measure = generate_cardinality(X.shape[axis])
 
     X_sorted, indices = torch.sort(X, axis = axis)
-    return f2(f1(torch.take(X_sorted, torch.arange(0, X_sorted.shape[axis]), axis), measure), axis=axis, keepdims=keepdims)
+    return f2(f1(X_sorted, measure), axis=axis, keepdims=keepdims)
 
-def choquet_integral_symmetric(X, measure=None, axis=0, keepdims=True):
+def torch_choquet(X, measure=None, axis=0, keepdims=True):
     '''
     Aggregates a numpy array alongise an axis using the choquet integral.
     
@@ -56,17 +77,16 @@ def choquet_integral_symmetric(X, measure=None, axis=0, keepdims=True):
     '''
     if measure is None:
         measure = generate_cardinality(X.shape[axis]) #Uses an implementation trick not valid for generallizations
-        measure_twin = torch.cat(measure[1:], torch.tensor(0))
-        measure_diff = measure - measure_twin
+        measure_twin = torch.cat((measure[1:], torch.tensor([0])))
+        measure = measure - measure_twin
 
-    X_sorted = torch.sort(X, axis = axis)
+    X_sorted, indices = torch.sort(X, axis = axis)
 
-    
-    X_agg = torch.sum(X * measure, dim=axis, keepdims=keepdims)
+    X_agg = torch.sum(X_sorted * measure, dim=axis, keepdims=keepdims)
 
     return X_agg
 
-def choquet_integral_CF(X, measure=None, axis=0, tnorm=tnorms.hamacher_tnorm, keepdims=True):
+def torch_CF(X, measure=None, axis=0, tnorm=hamacher_product, keepdims=False):
     '''
     Aggregates a numpy array alongise an axis using the choquet integral.
 
@@ -77,38 +97,35 @@ def choquet_integral_CF(X, measure=None, axis=0, tnorm=tnorms.hamacher_tnorm, ke
     if measure is None:
         measure = generate_cardinality(X.shape[axis])
 
-    X_sorted = np.sort(X, axis = axis)
+    X_sorted, indices = torch.sort(X, axis = axis)
 
-    X_differenced = np.apply_along_axis(_differentiation_1_distance, axis, X_sorted)
-    X_agg  = np.sum(np.apply_along_axis(lambda a: tnorm(a, measure), axis, X_differenced), axis=axis)
-
-    if keepdims:
-        X_agg = np.expand_dims(X_agg, axis=axis)
+    assert axis == 0 #Not implemented for other axis
+    X_differenced = diff(X_sorted)
+    X_agg  = torch.sum(tnorm(X_differenced, measure), dim=axis, keepdims=keepdims)
 
     return X_agg
 
 
-def choquet_integral_symmetric_cf12(X, measure=None, axis=0, f1=np.minimum.reduce, f2=np.minimum.reduce, keepdims=False):
+def torch_CF1F2(X, measure=None, axis=0, f1=torch.minimum, f2=torch.minimum, keepdims=False):
     '''
     Aggregates data using a generalization of the Choquet integral.
-    
-    All hail Giancarlo.
-    
+       
     :param X: Data to aggregate.
     :param measure: Vector containing the measure numeric values (Symmetric!)
     :param axis: Axis alongside to aggregate.
     '''
     if measure is None:
         measure = generate_cardinality(X.shape[axis])
-    X_sorted = np.sort(X, axis = axis)
-    F_1 = lambda a, b: f1(a[1:],b[1:])
-    F_2 = lambda a, b: f2(a[0:-1],b[1:])
-    F12 = lambda a, b: np.sum(np.append(f1(a[0], b[0]), F_1(a, b) - F_2(a, b)))
+    X1_sorted, indices = torch.sort(X, axis = axis)
+    X2 = diff(X1_sorted)
+    X2_sorted = X1_sorted - X2
+    
+    
+    F_1 = f1(X1_sorted, measure)
+    F_2 = f2(X2_sorted, measure)
+    
 
-    X_agg = np.apply_along_axis(F12, axis, X_sorted, measure)
-
-    if keepdims:
-        X_agg = np.expand_dims(X_agg, axis=axis)
+    X_agg = torch.sum(F_1 - F_2, dim=axis, keepdims=keepdims)
 
     return X_agg
 
@@ -149,7 +166,7 @@ class CCA_unimodal(torch.nn.Module):
         return logits
 
 class CCA_multimodal(torch.nn.Module):
-  def __init__(self, alfa_shape_s1, s1_agg1, s2_agg2, s2_agg1, s2_agg2):
+  def __init__(self, alfa_shape_s1, s1_agg1, s1_agg2, s2_agg1, s2_agg2):
         """
         alfa_shape_1 should be n_classifiers2
 
@@ -168,7 +185,7 @@ class CCA_multimodal(torch.nn.Module):
         self.alpha1 = torch.nn.Parameter(torch.tensor(torch.from_numpy(np.ones(alfa_shape_s1)* 0.5), requires_grad=True))
         self.alpha2 = torch.nn.Parameter(torch.tensor(0.5, requires_grad=True))
 
-        self.softmax = nn.Softmax(dim=1)
+        self.softmax = torch.nn.Softmax(dim=1)
 
   def forward(self, x):
         """
@@ -194,13 +211,13 @@ class CCA_multimodal(torch.nn.Module):
 
 #Helpers. 
 def ready_CCA_unimodal(x, ag1, ag2):
-	clasi, samples, clases = x.shape
-	net_ag = CCA_unimodal(ag1, ag2)
+    clasi, samples, clases = x.shape
+    net_ag = CCA_unimodal(ag1, ag2)
 
-	return net_ag
+    return net_ag
 
 def ready_CCA_multimodal(x, ag1, ag2, ag3, ag4):
-	clasi1, clasi2, samples, clases = x.shape
-	net_ag = CCA_multimodal(clasi2, ag1, ag2, ag3, ag4)
+    clasi1, clasi2, samples, clases = x.shape
+    net_ag = CCA_multimodal(clasi2, ag1, ag2, ag3, ag4)
 
-	return net_ag
+    return net_ag
