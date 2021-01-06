@@ -143,9 +143,9 @@ class CCA_unimodal(torch.nn.Module):
 
         self.alpha = torch.tensor(0.5, requires_grad=True)
 
-        self.myparameters = nn.Parameter(self.alpha)
+        self.myparameters = torch.nn.Parameter(self.alpha)
 
-        self.softmax = nn.Softmax(dim=1)
+        self.softmax = torch.nn.Softmax(dim=1)
 
   def forward(self, x):
         """
