@@ -29,6 +29,14 @@ def diff(X):
 # =============================================================================
 def hamacher_product(x, y):
     return x*y / (x + y - x*y + 0.00000001) 
+
+# =============================================================================
+# TCNORMS
+# =============================================================================
+def torch_max(x, axis=0, keepdims=False):
+    v, i = torch.max(x, dim=axis, keepdims=False)
+    
+    return v
 # =============================================================================
 # INTEGRALS
 # =============================================================================
@@ -64,7 +72,7 @@ def torch_sugeno(X, measure=None, axis = 0, f1 = torch.minimum, f2 = torch.amax,
     if measure is None:
         measure = generate_cardinality(X.shape[axis])
 
-    X_sorted, indices = torch.sort(X, axis = axis)
+    X_sorted, indices = torch.sort(X, dim=axis)
     return f2(f1(X_sorted, measure), axis=axis, keepdims=keepdims)
 
 def torch_choquet(X, measure=None, axis=0, keepdims=True):
@@ -156,8 +164,8 @@ class CCA_unimodal(torch.nn.Module):
 
         #HARDCODED FORWARD
         #Phase 1
-        c1 = self.agg1(x, 0 , False)
-        c2 = self.agg2(x, 0 , False)
+        c1 = self.agg1(x, axis=0, keepdims=False)
+        c2 = self.agg2(x, axis=0, keepdims=False)
 
         c_f = c1 * self.alpha + c2 * (1 - self.alpha)
 
@@ -182,7 +190,7 @@ class CCA_multimodal(torch.nn.Module):
         self.s2_agg1 = s2_agg1
         self.s2_agg2 = s2_agg2
 
-        self.alpha1 = torch.nn.Parameter(torch.tensor(torch.from_numpy(np.ones(alfa_shape_s1)* 0.5), requires_grad=True))
+        self.alpha1 = torch.nn.Parameter(torch.rand(alfa_shape_s1), requires_grad=True)
         self.alpha2 = torch.nn.Parameter(torch.tensor(0.5, requires_grad=True))
 
         self.softmax = torch.nn.Softmax(dim=1)
@@ -195,13 +203,13 @@ class CCA_multimodal(torch.nn.Module):
 
         #HARDCODED FORWARD
         #Phase 1
-        c1 = self.s1_agg1(x, 0 , False)
-        c2 = self.s1_agg2(x, 0 , False)
+        c1 = self.s1_agg1(x, axis=0 , keepdims=False)
+        c2 = self.s1_agg2(x, axis=0 , keepdims=False)
 
         c_f = c1 * self.alpha1 + c2 * (1 - self.alpha1)
 
-        c_f1 = self.s2_agg1(c_f, 0 , False)
-        c_f2 = self.s2_agg2(c_f, 0 , False)
+        c_f1 = self.s2_agg1(c_f, axis=0 , keepdims=False)
+        c_f2 = self.s2_agg2(c_f, axis=0 , keepdims=False)
 
         c_f2 = c_f1 * self.alpha2 + c_f2 * (1 - self.alpha2)
 
