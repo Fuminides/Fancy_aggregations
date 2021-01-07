@@ -40,6 +40,10 @@ def torch_max(x, axis=0, keepdims=False):
 # =============================================================================
 # INTEGRALS
 # =============================================================================
+def torch_mean(x, axis=0, keepdims=False):
+    v = torch.mean(x, dim=axis, keepdims=False)
+    
+    return v
 def generate_cardinality(N, p = 2):
     '''
     Generate the cardinality measure for a N-sized vector.
