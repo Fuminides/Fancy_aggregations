@@ -94,6 +94,10 @@ def torch_choquet(X, measure=None, axis=0, keepdims=True):
         measure = generate_cardinality(X.shape[axis]) #Uses an implementation trick not valid for generallizations
         measure_twin = torch.cat((measure[1:], torch.tensor([0])))
         measure = measure - measure_twin
+        new_shape = [1] * len(X.shape)
+        new_shape[axis] = len(measure)
+        measure = torch.reshape(measure, new_shape)
+
 
     X_sorted, indices = torch.sort(X, axis = axis)
 
