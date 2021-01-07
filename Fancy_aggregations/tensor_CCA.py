@@ -75,6 +75,9 @@ def torch_sugeno(X, measure=None, axis = 0, f1 = torch.minimum, f2 = torch.amax,
     '''
     if measure is None:
         measure = generate_cardinality(X.shape[axis])
+        new_shape = torch.ones([1] * len(X.shape))
+        new_shape[axis] = len(measure)
+        measure = torch.reshape(measure, new_shape)
 
     X_sorted, indices = torch.sort(X, dim=axis)
     return f2(f1(X_sorted, measure), axis=axis, keepdims=keepdims)
@@ -108,6 +111,9 @@ def torch_CF(X, measure=None, axis=0, tnorm=hamacher_product, keepdims=False):
     '''
     if measure is None:
         measure = generate_cardinality(X.shape[axis])
+        new_shape = torch.ones([1] * len(X.shape))
+        new_shape[axis] = len(measure)
+        measure = torch.reshape(measure, new_shape)
 
     X_sorted, indices = torch.sort(X, axis = axis)
 
@@ -128,6 +134,10 @@ def torch_CF1F2(X, measure=None, axis=0, f1=torch.minimum, f2=torch.minimum, kee
     '''
     if measure is None:
         measure = generate_cardinality(X.shape[axis])
+        new_shape = torch.ones([1] * len(X.shape))
+        new_shape[axis] = len(measure)
+        measure = torch.reshape(measure, new_shape)
+        
     X1_sorted, indices = torch.sort(X, axis = axis)
     X2 = diff(X1_sorted)
     X2_sorted = X1_sorted - X2
