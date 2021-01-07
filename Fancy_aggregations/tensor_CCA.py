@@ -75,7 +75,7 @@ def torch_sugeno(X, measure=None, axis = 0, f1 = torch.minimum, f2 = torch.amax,
     '''
     if measure is None:
         measure = generate_cardinality(X.shape[axis])
-        new_shape = torch.ones([1] * len(X.shape))
+        new_shape = [1] * len(X.shape)
         new_shape[axis] = len(measure)
         measure = torch.reshape(measure, new_shape)
 
@@ -111,7 +111,7 @@ def torch_CF(X, measure=None, axis=0, tnorm=hamacher_product, keepdims=False):
     '''
     if measure is None:
         measure = generate_cardinality(X.shape[axis])
-        new_shape = torch.ones([1] * len(X.shape))
+        new_shape = [1] * len(X.shape)
         new_shape[axis] = len(measure)
         measure = torch.reshape(measure, new_shape)
 
@@ -134,7 +134,7 @@ def torch_CF1F2(X, measure=None, axis=0, f1=torch.minimum, f2=torch.minimum, kee
     '''
     if measure is None:
         measure = generate_cardinality(X.shape[axis])
-        new_shape = torch.ones([1] * len(X.shape))
+        new_shape = [1] * len(X.shape)
         new_shape[axis] = len(measure)
         measure = torch.reshape(measure, new_shape)
         
