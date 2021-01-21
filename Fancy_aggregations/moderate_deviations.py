@@ -149,3 +149,17 @@ def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_f, M
 
     return result
 
+def multichannel_md(X, weights, epsilon=0.005, axis=0, keepdims=False):
+    '''
+    Multichannel moderate-deviation based agg fucntion.
+
+    More details in: 
+    Martin Papčo, Iosu Rodríguez-Martínez, Javier Fumanal-Idocin, Abdulrahman H. Altalhi, Humberto Bustince,
+	A fusion method for multi-valued data, Information Fusion, Volume 71, 2021, Pages 1-10, ISSN 1566-2535,
+	https://doi.org/10.1016/j.inffus.2021.01.001.
+
+    '''
+    reduce_size = X.shape[axis]
+    aux = weights * X
+    return np.sum(aux * (X + epsilon), axis=axis, keepdims=keepdims) / (reduce_size * weights * epsilon + np.sum(aux, axis=axis, keepdims=keepdims))
+
