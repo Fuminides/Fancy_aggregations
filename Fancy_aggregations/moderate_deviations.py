@@ -149,3 +149,10 @@ def md_aggregation(X, axis=0, keepdims=True, md_function=moderate_deviation_f, M
 
     return result
 
+def md_weighted_multidimensional_aggregation(X, weights, epsilon=0.005, axis=0, keepdims=True):
+    '''
+    Aggregation using a md for multi-valued data.
+    '''
+    reduce_size = X.shape[axis]
+    aux = weights * X
+    return np.sum(aux * (X + eps), axis=axis, keepdims=keepdims) / (reduce_size * weights * eps + np.sum(aux, axis=axis, keepdims=keepdims))
