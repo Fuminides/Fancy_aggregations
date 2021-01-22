@@ -161,6 +161,6 @@ def multichannel_md(X, weights, epsilon=0.005, axis=0, keepdims=False):
     '''
     reduce_size = X.shape[axis]
     aux = weights * X
-    return np.sum(aux * (X + epsilon), axis=axis, keepdims=keepdims) / np.sum(reduce_size * weights * epsilon) + np.sum(aux, axis=axis, keepdims=keepdims))
+    return np.sum(aux * (X + epsilon), axis=axis, keepdims=keepdims) / np.sum(reduce_size * weights * epsilon) + np.sum(aux, axis=axis, keepdims=keepdims)
 
 
