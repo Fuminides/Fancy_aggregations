@@ -1,5 +1,4 @@
 import torch
-import numpy as np
 
 import torch.nn.functional as F
 
@@ -191,6 +190,45 @@ class CCA_unimodal(torch.nn.Module):
         
         return logits
 
+class CCA_adaptative_unimodal(torch.nn.Module):
+  def __init__(self, alfa_shape, agg1, agg2):
+        """
+        In the constructor we instantiate two nn.Linear modules and assign them as
+        member variables.
+        """
+        super(CCA_unimodal, self).__init__()
+
+        #HARDCODED AGGS
+        self.agg1 = agg1
+        self.agg2 = agg2
+
+        self.alpha = torch.tensor(torch.random(alfa_shape), requires_grad=True)
+
+        self.w = torch.nn.Parameter(self.alpha)
+        self.b = torch.nn.Parameter(torch.random(alfa_shape), requires_grad=True)
+
+        self.softmax = torch.nn.Softmax(dim=1)
+
+  def forward(self, x, axis=0):
+        """
+        In the forward function we accept a Tensor of input data and we must return
+        a Tensor of output data. We can use Modules defined in the constructor as
+        well as arbitrary operators on Tensors.
+        """
+
+        #HARDCODED FORWARD
+        #Phase 1
+        c1 = self.agg1(x, axis=0, keepdims=False)
+        c2 = self.agg2(x, axis=0, keepdims=False)
+        
+        alpha = torch.sum(x * self.w + self.b, dim=axis)
+        
+        c_f = c1 * alpha + c2 * (1 - alpha)
+        
+        logits = self.softmax(c_f)
+        
+        return logits
+
 class CCA_multimodal(torch.nn.Module):
   def __init__(self, alfa_shape_s1, s1_agg1, s1_agg2, s2_agg1, s2_agg2):
         """
@@ -228,6 +266,61 @@ class CCA_multimodal(torch.nn.Module):
 
         c_f1 = self.s2_agg1(c_f, axis=0 , keepdims=False)
         c_f2 = self.s2_agg2(c_f, axis=0 , keepdims=False)
+
+        c_f2 = c_f1 * self.alpha2 + c_f2 * (1 - self.alpha2)
+
+        logits = self.softmax(c_f2)
+        
+        return logits
+
+class CCA_adaptative_multimodal(torch.nn.Module):
+  def __init__(self, alfa_shape_s1, alfa_shape_s2, s1_agg1, s1_agg2, s2_agg1, s2_agg2):
+        """
+        Adaptative convex combination of two aggregations in a multimodal setting.
+        
+        alfa_shape_1 should be n_classifiers2
+
+        In the constructor we instantiate two nn.Linear modules and assign them as
+        member variables.
+        """
+        super(CCA_multimodal, self).__init__()
+
+        #HARDCODED AGGS
+        self.s1_agg1 = s1_agg1
+        self.s1_agg2 = s1_agg2
+
+        self.s2_agg1 = s2_agg1
+        self.s2_agg2 = s2_agg2
+
+        self.weights1 = torch.nn.Parameter(torch.rand(alfa_shape_s1), requires_grad=True)
+        self.weights2 = torch.nn.Parameter(torch.rand(alfa_shape_s2), requires_grad=True)
+
+        self.bias1 = torch.nn.Parameter(torch.rand(alfa_shape_s1), requires_grad=True)
+        self.bias2 = torch.nn.Parameter(torch.rand(alfa_shape_s2), requires_grad=True)
+        
+        self.softmax = torch.nn.Softmax(dim=1)
+
+  def forward(self, x, axis=0):
+        """
+        x shape should be:
+        n_classifiers1 x n_classifiers2 x samples x clases
+        """
+
+        #HARDCODED FORWARD
+        #Phase 1
+        c1 = self.s1_agg1(x, axis=0 , keepdims=False)
+        c2 = self.s1_agg2(x, axis=0 , keepdims=False)
+
+        alpha1 = torch.sum(x * self.weights1 + self.bias1, dim=axis)
+        
+        c_f = c1 * alpha1 + c2 * (1 - alpha1)
+
+        c_f1 = self.s2_agg1(c_f, axis=0 , keepdims=False)
+        c_f2 = self.s2_agg2(c_f, axis=0 , keepdims=False)
+        
+        alpha2 = torch.sum(c_f * self.weights2 + self.bias2, dim=axis)
+        
+        c_f = c1 * alpha2 + c2 * (1 - alpha2)
 
         c_f2 = c_f1 * self.alpha2 + c_f2 * (1 - self.alpha2)
 
