@@ -276,7 +276,7 @@ class CCA_multimodal(torch.nn.Module):
         return logits
 
 class CCA_adaptative_multimodal(torch.nn.Module):
-  def __init__(self, alfa_shape_s1, alfa_shape_s2, s1_agg1, s1_agg2, s2_agg1, s2_agg2, activation_function=torch.sigmoid):
+  def __init__(self, alfa_shape_s1, alfa_shape_s2, s1_agg1, s1_agg2, s2_agg1, s2_agg2, act_func=torch.sigmoid):
         """
         Adaptative convex combination of two aggregations in a multimodal setting.
 
@@ -294,15 +294,14 @@ class CCA_adaptative_multimodal(torch.nn.Module):
         self.s2_agg1 = s2_agg1
         self.s2_agg2 = s2_agg2
 
-        self.weights1 = torch.nn.Parameter(torch.rand(alfa_shape_s1, 1, 1, 1), requires_grad=True)
+        self.weights1 = torch.nn.Parameter(torch.rand(1, alfa_shape_s1, 1, 1), requires_grad=True)
         self.weights2 = torch.nn.Parameter(torch.rand(alfa_shape_s2, 1, 1), requires_grad=True)
 
         self.bias1 = torch.nn.Parameter(torch.rand(alfa_shape_s1, 1, 1, 1), requires_grad=True)
         self.bias2 = torch.nn.Parameter(torch.rand(alfa_shape_s2, 1, 1), requires_grad=True)
 
+        self.act = act_func
         self.softmax = torch.nn.Softmax(dim=1)
-
-        self.act = activation_function
 
   def forward(self, x, axis=0):
         """
@@ -312,25 +311,24 @@ class CCA_adaptative_multimodal(torch.nn.Module):
 
         #HARDCODED FORWARD
         #Phase 1
-        c1 = self.s1_agg1(x, axis=0 , keepdims=False)
-        c2 = self.s1_agg2(x, axis=0 , keepdims=False)
+        c1 = self.s1_agg1(x, axis=1 , keepdims=False)
+        c2 = self.s1_agg2(x, axis=1 , keepdims=False)
 
-        alpha1 = torch.sum(x * self.weights1 + self.bias1, dim=axis)
-        alpha1 = self.act(alpha1)
+        alpha1 = torch.sum(x * self.weights1 + self.bias1, dim=1)
 
         c_f = c1 * alpha1 + c2 * (1 - alpha1)
 
         c_f1 = self.s2_agg1(c_f, axis=0 , keepdims=False)
         c_f2 = self.s2_agg2(c_f, axis=0 , keepdims=False)
 
-        alpha2 = torch.sum(c_f * self.weights2 + self.bias2, dim=axis)
-        alpha2 = self.act(alpha2)
+        alpha2 = self.act(torch.sum(c_f * self.weights2 + self.bias2, dim=0))
 
         c_f2 = c_f1 * alpha2 + c_f2 * (1 - alpha2)
 
         logits = self.softmax(c_f2)
 
         return logits
+
 
 #Helpers.
 def ready_CCA_unimodal(x, ag1, ag2):
