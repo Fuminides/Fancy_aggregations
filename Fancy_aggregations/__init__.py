@@ -24,7 +24,6 @@ from . import integrals
 from . import implications
 from . import intervals
 from . import moderate_deviations
-from . import networks
 from . import owas
 from . import penalties
 from . import rankings
