@@ -16,6 +16,8 @@ To suggest changes or submit new code please use the github page.
 import numpy as np
 
 from . import implications as _imp
+from . import integrals as _int
+from Fancy_aggregations import intervals as _iv
 
 def k_alpha_operator(a, alpha_order):
     return a[1] * alpha_order + (1-alpha_order)*a[0]
@@ -84,4 +86,37 @@ def admissible_intervalued_array_argsort(X, axis=0, alpha_order=0.5, beta_order=
         res = np.swapaxes(res, axis, len(X.shape)-2)
 
     return np.squeeze(res)
+    
+def sugeno_general(X, alpha_order, beta_order, tnorm=np.minimum, tconorm=np.max, axis=0, keepdims=True):
+    # sort interval according to alpha and beta
+    features, samples, clases, interl_dim = X.shape
+    #increasing_iv = sorted(X, key=lambda a: (_iv.k_alpha_operator(a, alpha_order), _iv.k_alpha_operator(a, beta_order)))
+    sorted_X = admissible_intervalued_array_sort(X, axis=axis, keepdims=False, alpha_order=alpha_order, beta_order=beta_order)
+    medida = _int.generate_cardinality(X.shape[axis], 2)
+    oneshapes = np.ones(len(X.shape)-1, dtype=np.int32)
+    oneshapes[axis] = len(medida)
+    medida = np.array(medida).reshape(oneshapes)
+
+    if tnorm == np.prod:
+    	iv1 = sorted_X[:, :, :, 0] * medida
+    	iv2 = sorted_X[:, :, :, 1] * medida
+
+    else:
+        iv1 = tnorm(sorted_X[:, :, :, 0], medida)
+        iv2 = tnorm(sorted_X[:, :, :, 1], medida)
+
+    sorted_X[:, :, :, 0] = iv1
+    sorted_X[:, :, :, 1] = iv2
+
+    if tconorm == np.max:
+        sorted_X = admissible_intervalued_array_sort(sorted_X, axis=axis, keepdims=False, alpha_order=alpha_order, beta_order=beta_order)
+        res = sorted_X[-1, :, :, :]
+
+    if not keepdims:
+        res = np.squeeze(res)
+
+    return res
+
+def sugeno(X, alpha_order, beta_order, axis=0, keepdims=True):
+    return sugeno_general(X, alpha_order, beta_order, tnorm=np.minimum, tconorm=np.max, axis=axis, keepdims=keepdims)
     
