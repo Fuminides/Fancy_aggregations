@@ -17,7 +17,7 @@ import numpy as np
 
 from . import implications as _imp
 from . import integrals as _int
-from Fancy_aggregations import intervals as _iv
+from . import tnorms
 
 def k_alpha_operator(a, alpha_order):
     return a[1] * alpha_order + (1-alpha_order)*a[0]
@@ -90,7 +90,6 @@ def admissible_intervalued_array_argsort(X, axis=0, alpha_order=0.5, beta_order=
 def sugeno_general(X, alpha_order, beta_order, tnorm=np.minimum, tconorm=np.max, axis=0, keepdims=True):
     # sort interval according to alpha and beta
     features, samples, clases, interl_dim = X.shape
-    #increasing_iv = sorted(X, key=lambda a: (_iv.k_alpha_operator(a, alpha_order), _iv.k_alpha_operator(a, beta_order)))
     sorted_X = admissible_intervalued_array_sort(X, axis=axis, keepdims=False, alpha_order=alpha_order, beta_order=beta_order)
     medida = _int.generate_cardinality(X.shape[axis], 2)
     oneshapes = np.ones(len(X.shape)-1, dtype=np.int32)
@@ -111,12 +110,32 @@ def sugeno_general(X, alpha_order, beta_order, tnorm=np.minimum, tconorm=np.max,
     if tconorm == np.max:
         sorted_X = admissible_intervalued_array_sort(sorted_X, axis=axis, keepdims=False, alpha_order=alpha_order, beta_order=beta_order)
         res = sorted_X[-1, :, :, :]
+    else:
+    	res = tconorm(sorted_X, axis=axis, keepdims=keepdims)
 
     if not keepdims:
         res = np.squeeze(res)
 
     return res
 
-def sugeno(X, alpha_order, beta_order, axis=0, keepdims=True):
+def sugeno_minmax(X, alpha_order, beta_order, axis=0, keepdims=True):
     return sugeno_general(X, alpha_order, beta_order, tnorm=np.minimum, tconorm=np.max, axis=axis, keepdims=keepdims)
+
+def sugeno(X, alpha_order, beta_order, axis=0, keepdims=True):
+    features, samples, clases, interl_dim = X.shape
+    sorted_X = admissible_intervalued_array_sort(X, axis=axis, keepdims=False, alpha_order=alpha_order, beta_order=beta_order)
+    medida = _int.generate_cardinality(X.shape[axis], 2)
+    oneshapes = np.ones(len(X.shape)-1, dtype=np.int32)
+    oneshapes[axis] = len(medida)
+    medida = np.array(medida).reshape(oneshapes)
+
+    t1 = np.mean(X, axis=0)
+    t2 = np.mean(medida * (X * X - X), axis=0)
+
+    return t1 + t2
     
+def sugeno_f(X, alpha_order, beta_order, axis=0, keepdims=True):
+    return sugeno_general(X, alpha_order, beta_order, tnorm=np.prod, tconorm=np.mean, axis=axis, keepdims=keepdims)
+
+def sugeno_hamacher(X, alpha_order, beta_order, axis=0, keepdims=True):
+    return sugeno_general(X, alpha_order, beta_order, tnorm=tnorms.hamacher, tconorm=np.mean, axis=axis, keepdims=keepdims)
