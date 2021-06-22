@@ -32,8 +32,20 @@ def _differentiation_1_distance(X):
     #Perform differentiation for each consecuent point in the X dataset (time series)
     return np.append(X[0], X[1:] - X[0:-1])
 
+def dissimilitud_1_distance(X, measure, dis, axis=0):
+    #Perform differentiation for each consecuent point in the X dataset (time series)
+    def dis_1d(X, measure, dis):
+        measured_i_1 = X[0:-1] * measure
+        measured_i = X[1:] * measure
+        
+        disis = np.sum(dis(measured_i, measured_i_1))
+        
+        return X[0] + disis
+        
+    return np.apply_along_axis(dis_1d, axis, X, dis=dis, measure=measure)
 
-def generate_cardinality(N, p = 2):
+
+def generate_cardinality(N, p = 1):
     '''
     Generate the cardinality measure for a N-sized vector.
     '''
@@ -142,7 +154,7 @@ def sugeno_fuzzy_integral(X, measure=None, axis = 0, keepdims=True):
 
 def sugeno_fuzzy_integral_generalized(X, measure, axis = 0, f1 = np.minimum, f2 = np.amax, keepdims=True):
     '''
-    Aggregates data using a generalization of the Choquet integral.
+    Aggregates data using a generalization of the Sugeno integral.
     
     :param X: Data to aggregate.
     :param measure: Vector containing the measure numeric values (Symmetric!)
@@ -150,3 +162,26 @@ def sugeno_fuzzy_integral_generalized(X, measure, axis = 0, f1 = np.minimum, f2 
     '''
     X_sorted = np.sort(X, axis = axis)
     return f2(f1(np.take(X_sorted, np.arange(0, X_sorted.shape[axis]), axis), measure), axis=axis, keepdims=keepdims)
+
+# =============================================================================
+# DX-CHOQUETS
+# =============================================================================
+def general_choquet_dx(X, measure, axis=0, keepdims=False, rdf=lambda x, y: np.abs(x - y)):
+    '''
+    Aggregates data using a generalization of the Choquet integral using dissimilarities.
+    
+    :param X: Data to aggregate.
+    :param measure: Vector containing the measure numeric values (Symmetric!)
+    :param axis: Axis alongside to aggregate.
+    '''
+    if measure is None:
+        measure = generate_cardinality(X.shape[axis])
+
+    X_sorted = np.sort(X, axis = axis)
+
+    X_agg  = dissimilitud_1_distance(X_sorted, measure[1:], dis=rdf, axis=0)
+
+    if keepdims:
+        X_agg = np.expand_dims(X_agg, axis=axis)
+    
+    return X_agg

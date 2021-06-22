@@ -12,6 +12,7 @@ from . import moderate_deviations
 from . import tnorms
 from . import owas
 from . import overlaps
+from . import dissimilarities as dis
 
 supported_functions = ['mean', 'median', 'min', 'max', 'sugeno', 'shamacher', 'choquet', 'cfminmin', 'cf12', 'cf', 'owa1', 'owa2', 'owa3', 'geomean', 'sinoverlap', 'hmean',
                 'hamacher', 'luka', 'drastic', 'nilpotent', 'probabilistic_sum', 'bounded_sum', 'drastic_tcnorm', 'nilpotent_maximum', 'einstein_sum']
@@ -50,6 +51,18 @@ def parse(agg_name, axis_f = 0, keepdims_f=True):
         return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.sugeno_fuzzy_integral_generalized(a, integrals.generate_cardinality_matrix(a.shape[axis], a.shape), axis=axis, keepdims=keepdims, f1 = tnorms.prod, f2 = np.sum)
     elif agg_minuscula == 'choquet':
         return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.choquet_integral_symmetric(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims)
+    elif agg_minuscula == 'choquetdx0':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.general_choquet_dx(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims, rdf=dis.abs_v)
+    elif agg_minuscula == 'choquetdx1':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.general_choquet_dx(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims, rdf=dis.quadratic)
+    elif agg_minuscula == 'choquetdx2':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.general_choquet_dx(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims, rdf=dis.square)
+    elif agg_minuscula == 'choquetdx3':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.general_choquet_dx(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims, rdf=dis.squarewise)
+    elif agg_minuscula == 'choquetdx4':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.general_choquet_dx(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims, rdf=dis.abs_square)
+    elif agg_minuscula == 'choquetdx5':
+        return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.general_choquet_dx(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims, rdf=dis.root_square)
     elif agg_minuscula == 'cfminmin':
         return lambda a, axis=axis_f, keepdims=keepdims_f: integrals.choquet_integral_symmetric_cf12(a, integrals.generate_cardinality(a.shape[axis]), axis=axis, keepdims=keepdims, f1=np.minimum, f2=np.minimum)
     elif agg_minuscula == 'cf12':
