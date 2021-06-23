@@ -14,7 +14,7 @@ def quadratic(x, y):
     return (x-y) * (x-y)
 
 def square(x, y):
-    return np.sqrt(abs_v)
+    return np.sqrt(abs_v(x, y))
 
 def squarewise(x, y):
     return np.abs(np.sqrt(x) - np.sqrt(y))
