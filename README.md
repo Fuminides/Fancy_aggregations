@@ -14,6 +14,12 @@ Fanzy Aggregations is a package written in python that implements modern functio
 - MD deviations.
 - N-Overlap functions.
 
+## Citation
+
+Fancy Aggregations has its own DOI. If you want to cite it, you can use it. In case you prefer to cite a published paper, you can find a comprehensive list of aggregations, implemented with this library in:
+
+Fumanal-Idocin, J., Wang, Y. K., Lin, C. T., Fernández, J., Sanz, J. A., & Bustince, H. (2021). Motor-Imagery-Based Brain-Computer Interface Using Signal Derivation and Aggregation Functions. IEEE Transactions on Cybernetics.
+
 ## Reference papers
 Each file contains the correspondent paper in its header. Here it is the whole list:
 
