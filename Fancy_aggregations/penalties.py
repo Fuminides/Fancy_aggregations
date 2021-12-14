@@ -68,10 +68,12 @@ cost_functions = [_convex_comb(_cuadratic_cost, _realistic_optimistic_cost),
 # =============================================================================
 def penalty_aggregation(X, agg_functions, axis=0, keepdims=False, cost=_cuadratic_cost):
     '''
+    Selects the best aggregation function based on the penalty chosen
 
-    :param X:
-    :param agg_functions:
-    :return:
+    :param X: input data numpy array
+    :param agg_functions: aggregtion functions
+    :param cost: penalty function chosen.
+    :return: the best aggregation for each one according to the penalty function.
     '''
     agg_matrix = []
     agg_distances_shape =  [len(agg_functions)] + list(agg_functions[0](X, axis=axis, keepdims=False).shape)
@@ -96,23 +98,4 @@ def penalty_aggregation(X, agg_functions, axis=0, keepdims=False, cost=_cuadrati
 
     return res
 
-def penalty_optimization(X, agg_functions, axis=0, keepdims=False, cost=_cuadratic_cost):
-    '''
-    EXPERIMENTAL: instead of computing the penalty function using aggregation functions,
-    it uses an optimization algorithm to reduce the cost. (More costly)
-    :param X:
-    :param agg_functions:
-    :return:
-    '''
-    from scipy.optimize import basinhopping
-    minimizer_kwargs = {"method":"L-BFGS-B"}
-
-    init_pop = np.random.normal(0.5, 0.25, X.shape[np.arange(len(X.shape))!=axis])
-    function_alpha = lambda yhat: cost(X, yhat, axis=axis)
-    res = basinhopping(function_alpha, x0=init_pop, minimizer_kwargs=minimizer_kwargs, niter=100)
-
-    if keepdims:
-        res =  res= np.expand_dims(res, axis=axis)
-
-    return res.x
 
