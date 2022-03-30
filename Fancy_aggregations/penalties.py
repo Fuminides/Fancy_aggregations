@@ -36,7 +36,8 @@ def _random_cost(real, yhat, axis):
     return np.mean((0.5 - yhat)**2, axis=axis, keepdims=False)
 
 def _optimistic_cost(real, yhat, axis):
-	return np.mean((1 - yhat)**2, axis=axis, keepdims=False)
+    return (1 - yhat)**2
+	#return np.mean((1 - yhat)**2, axis=axis, keepdims=False)
 
 def _realistic_optimistic_cost(real, yhat, axis):
 	return np.mean((np.max(real, axis=axis, keepdims=True) - yhat)**2, axis=axis, keepdims=False)
